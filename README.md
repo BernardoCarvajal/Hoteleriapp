@@ -61,6 +61,36 @@ La aplicación estará disponible en:
 - http://localhost:8000 - Endpoint principal
 - http://localhost:8000/docs - Documentación interactiva (Swagger UI)
 
+## Autenticación y Tokens JWT
+
+La API utiliza tokens JWT (JSON Web Tokens) para la autenticación de usuarios. Sigue estos pasos para autenticarte:
+
+1. Primero, debes obtener un token haciendo una solicitud POST a `/api/usuarios/login` con tus credenciales:
+   ```json
+   {
+     "email": "admin@hoteleriapp.com",
+     "password": "admin123"
+   }
+   ```
+
+2. La respuesta incluirá un token de acceso:
+   ```json
+   {
+     "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+     "token_type": "bearer"
+   }
+   ```
+
+3. Para usar este token en Swagger UI:
+   - Haz clic en el botón "Authorize" en la parte superior derecha de la página
+   - Ingresa tu token con el formato `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`
+   - Haz clic en "Authorize" para guardar
+
+4. Si estás haciendo solicitudes desde código o Postman:
+   - Incluye un encabezado `Authorization` con el valor `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`
+
+**Nota:** Los tokens JWT expiran después de 30 minutos. Si recibes un error 401, es posible que debas obtener un nuevo token.
+
 ## Endpoints Disponibles
 
 ### Gestión de Reservas
@@ -125,3 +155,28 @@ Si tienes problemas al instalar Pillow, puedes intentar:
 ```bash
 pip install --only-binary=:all: Pillow
 ```
+
+### Problemas de CORS
+Si tienes errores de CORS al hacer solicitudes desde tu frontend, asegúrate de:
+
+1. Verificar que la URL de tu API es correcta en las solicitudes del frontend.
+2. Si estás desarrollando en localhost, usa el protocolo `http://` y no `file://`.
+3. Asegúrate de que el origen desde donde haces las solicitudes está permitido:
+
+La API permite solicitudes desde los siguientes orígenes por defecto:
+- http://localhost:8000
+- http://localhost:3000 (típico puerto de React)
+- http://localhost:5173 (típico puerto de Vite)
+- http://127.0.0.1:8000
+- http://127.0.0.1:3000
+- http://127.0.0.1:5173
+
+Si necesitas permitir solicitudes desde otros orígenes, edita el archivo `app/api.py` y añade tu origen a la lista `origins`.
+
+### Errores de Autenticación (401 o 422)
+Si recibes errores al hacer solicitudes autenticadas:
+
+1. Asegúrate de incluir el token en el formato correcto: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`
+2. Verifica que el token no haya expirado (validez de 30 minutos)
+3. Comprueba que estás enviando el token en el encabezado `Authorization`
+4. Si usas Swagger UI y no ves el botón "Authorize", actualiza la página y verifica que la aplicación se esté ejecutando con la configuración más reciente

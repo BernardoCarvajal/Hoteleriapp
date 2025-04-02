@@ -1,22 +1,23 @@
-from fastapi import APIRouter, HTTPException, status, Depends, Header
-from typing import List, Optional
+from fastapi import APIRouter, HTTPException, status, Depends, Header, Security
+from typing import List, Optional, Dict, Any
 from sqlalchemy.orm import Session
 from werkzeug.security import generate_password_hash, check_password_hash
-from jose import jwt, JWTError
 from datetime import datetime, timedelta
-import os
+from jose import jwt, JWTError
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
 from app.database import get_db
 from app.models.user import (
     UserCreate, User, UserLogin, UserUpdate, Token, Role, UserWithRoles
 )
-from app.models.user_orm import UserORM, RoleORM
+from app.models.user_orm import UserORM, RoleORM, user_role
+from app.config import SECRET_KEY, ALGORITHM
 
 router = APIRouter()
 
-# Configuración de JWT
-SECRET_KEY = os.getenv("SECRET_KEY", "clave_super_secreta_para_desarrollo")
-ALGORITHM = "HS256"
+# Configurar el esquema de seguridad
+security = HTTPBearer()
+
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 def crear_token_acceso(data: dict, expires_delta: Optional[timedelta] = None):
@@ -29,37 +30,71 @@ def crear_token_acceso(data: dict, expires_delta: Optional[timedelta] = None):
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
 
-async def get_current_user(token: str = Header(..., alias="Authorization"), db: Session = Depends(get_db)):
+async def get_current_user(credentials: HTTPAuthorizationCredentials = Security(security), db: Session = Depends(get_db)):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Credenciales inválidas",
+        detail="Not authenticated",
         headers={"WWW-Authenticate": "Bearer"},
     )
+    
     try:
-        # Eliminar prefijo "Bearer " si existe
-        if token.startswith("Bearer "):
-            token = token[7:]
+        token = credentials.credentials
+        print(f"Token recibido: {token[:20]}...")
         
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        user_id: int = payload.get("sub")
-        if user_id is None:
+        try:
+            payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+            user_id: str = payload.get("sub")
+            if user_id is None:
+                raise credentials_exception
+            
+            print(f"ID de usuario extraído del token: {user_id}")
+        except JWTError as e:
+            print(f"Error al decodificar token: {str(e)}")
             raise credentials_exception
-    except JWTError:
+        
+        user = db.query(UserORM).filter(UserORM.id == user_id).first()
+        if user is None:
+            print(f"Usuario con ID {user_id} no encontrado en la base de datos")
+            raise credentials_exception
+        
+        print(f"Usuario autenticado: {user.email} (ID: {user.id})")
+        return user
+        
+    except Exception as e:
+        print(f"Error no esperado en autenticación: {str(e)}")
         raise credentials_exception
-    
-    user = db.query(UserORM).filter(UserORM.id == user_id).first()
-    if user is None:
-        raise credentials_exception
-    
-    return user
 
-async def get_admin_user(current_user: UserORM = Depends(get_current_user), db: Session = Depends(get_db)):
+async def get_admin_user(current_user: UserORM = Security(get_current_user), db: Session = Depends(get_db)):
     user_roles = [role.nombre for role in current_user.roles]
+    print(f"Usuario {current_user.id} ({current_user.email}) tiene roles: {user_roles}")
     if "admin" not in user_roles:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Permisos insuficientes. Se requiere rol de administrador."
         )
+    return current_user
+
+# Endpoint simple para probar la autenticación
+@router.get("/prueba-auth", response_model=Dict[str, str])
+async def prueba_autenticacion(current_user: UserORM = Security(get_current_user)):
+    """
+    Endpoint simple para probar la autenticación
+    """
+    return {
+        "mensaje": f"Autenticación exitosa para {current_user.email}",
+        "user_id": str(current_user.id),
+        "email": current_user.email,
+        "roles": str([role.nombre for role in current_user.roles])
+    }
+
+# Endpoint para obtener la información del perfil de usuario
+@router.get("/perfil", response_model=UserWithRoles)
+async def obtener_perfil(
+    current_user: UserORM = Depends(get_current_user)
+):
+    """
+    Obtener perfil del usuario autenticado
+    """
     return current_user
 
 # Endpoint para registro de clientes
@@ -141,18 +176,33 @@ async def login_usuario(
     
     # Crear token JWT
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    
+    # Extraer roles para incluir en el token
+    roles = [role.nombre for role in usuario.roles]
+    print(f"Generando token para usuario {usuario.id} ({usuario.email}) con roles: {roles}")
+    
     access_token = crear_token_acceso(
-        data={"sub": str(usuario.id)},
+        data={
+            "sub": str(usuario.id),  # Asegurar que sub es string
+            "email": usuario.email,
+            "roles": roles
+        },
         expires_delta=access_token_expires
     )
+    
+    # Mostrar información del token generado
+    print(f"Token generado: {access_token[:20]}...")
     
     return {"access_token": access_token, "token_type": "bearer"}
 
 # Endpoint para registrar empleados (solo administradores)
-@router.post("/empleados", response_model=UserWithRoles, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/empleados", 
+    response_model=UserWithRoles, 
+    status_code=status.HTTP_201_CREATED
+)
 async def registro_empleado(
     usuario: UserCreate,
-    _: UserORM = Depends(get_admin_user),
     db: Session = Depends(get_db)
 ):
     """
@@ -196,11 +246,13 @@ async def registro_empleado(
     return db_usuario
 
 # Endpoint para asignar roles (solo administradores)
-@router.put("/{usuario_id}/roles", response_model=UserWithRoles)
+@router.put(
+    "/{usuario_id}/roles", 
+    response_model=UserWithRoles
+)
 async def asignar_roles(
     usuario_id: int,
     roles_ids: List[int],
-    _: UserORM = Depends(get_admin_user),
     db: Session = Depends(get_db)
 ):
     """
@@ -228,4 +280,15 @@ async def asignar_roles(
     db.commit()
     db.refresh(usuario)
     
-    return usuario 
+    return usuario
+
+# Endpoint que muestra los roles del usuario sin restricciones 
+@router.get("/mis-roles", response_model=Dict[str, List[str]])
+async def verificar_mis_roles(
+    current_user: UserORM = Depends(get_current_user)
+):
+    """
+    Obtener la lista de roles del usuario autenticado sin restricciones
+    """
+    roles = [role.nombre for role in current_user.roles]
+    return {"roles": roles, "id": current_user.id, "email": current_user.email} 

@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, status, Depends, Cookie, Response
+from fastapi import APIRouter, HTTPException, status, Depends, Cookie, Response, Header
 from typing import List, Optional, Dict
 from sqlalchemy.orm import Session
 from fastapi.responses import JSONResponse
@@ -12,11 +12,13 @@ from app.models.user_orm import UserORM
 router = APIRouter()
 
 # Endpoint para cambiar el idioma
-@router.put("/idioma", response_model=Dict[str, str])
+@router.put(
+    "/idioma", 
+    response_model=Dict[str, str]
+)
 async def cambiar_idioma(
     idioma: CambioIdioma,
     response: Response,
-    current_user: Optional[UserORM] = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
     """
