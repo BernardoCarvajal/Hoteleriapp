@@ -18,7 +18,6 @@ Hoteleriapp/
 ├── app/                # Directorio principal de la aplicación
 │   ├── models/         # Modelos Pydantic y ORM
 │   ├── routers/        # Routers para los endpoints 
-│   ├── services/       # Servicios y lógica de negocio
 │   ├── api.py          # Configuración de la API
 │   ├── database.py     # Configuración de la base de datos
 │   └── init_db.py      # Inicialización de la base de datos
@@ -31,30 +30,38 @@ Hoteleriapp/
 
 ## Instalación
 
-1. Instala las dependencias:
+1. Clona el repositorio:
+```bash
+git clone <url_del_repositorio>
+cd Hoteleriapp
+```
+
+2. Instala las dependencias:
 ```bash
 pip install -r requirements.txt
 ```
 
 ## Configuración
 
-2. Crea un archivo `.env` basado en `.env.example`:
+1. Crea un archivo `.env` basado en `.env.example`:
 ```bash
 copy .env.example .env  # En Windows
 # o
 cp .env.example .env    # En Unix/Linux/MacOS
 ```
 
-3. Edita el archivo `.env` con la configuración deseada.
+2. Edita el archivo `.env` con la configuración deseada.
 
 ## Ejecución
 
-Para ejecutar la aplicación, usa el siguiente comando:
+Para ejecutar la aplicación, puedes usar uno de los siguientes comandos:
 
 ```bash
+# Usando Python directamente
 python -3.13 main.py
-# o simplemente 
-python main.py  # Si Python 3.13 es tu versión por defecto
+
+# Usando uvicorn directamente (para modo de desarrollo con recarga automática)
+python -3.13 -m uvicorn main:app --reload
 ```
 
 La aplicación estará disponible en:
@@ -91,6 +98,31 @@ La API utiliza tokens JWT (JSON Web Tokens) para la autenticación de usuarios. 
 
 **Nota:** Los tokens JWT expiran después de 30 minutos. Si recibes un error 401, es posible que debas obtener un nuevo token.
 
+### Ejemplo de solicitud con token JWT usando fetch:
+
+```javascript
+fetch('http://localhost:8000/api/reservas', {
+  method: 'GET',
+  headers: {
+    'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
+    'Content-Type': 'application/json'
+  }
+})
+.then(response => response.json())
+.then(data => console.log(data));
+```
+
+### Ejemplo usando Axios:
+
+```javascript
+axios.get('http://localhost:8000/api/reservas', {
+  headers: {
+    'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
+  }
+})
+.then(response => console.log(response.data));
+```
+
 ## Endpoints Disponibles
 
 ### Gestión de Reservas
@@ -105,6 +137,8 @@ La API utiliza tokens JWT (JSON Web Tokens) para la autenticación de usuarios. 
 - `POST /api/usuarios/login` - Login de usuarios con JWT
 - `POST /api/usuarios/empleados` - Registrar empleados (solo administradores)
 - `PUT /api/usuarios/{id}/roles` - Asignación de roles
+- `GET /api/usuarios/mis-roles` - Obtener roles del usuario autenticado
+- `GET /api/usuarios/perfil` - Obtener perfil del usuario autenticado
 
 ### Reportes
 - `GET /api/reportes/reservas` - Generar reportes de reservas
@@ -121,14 +155,14 @@ El proyecto utiliza SQLite como base de datos. El archivo de la base de datos (`
 
 Para ver el contenido de la base de datos, puedes utilizar:
 
-1. El script incluido:
+1. El script incluido (si está disponible):
 ```bash
 python view_db.py
 ```
 
 2. Herramientas externas como:
    - [SQLiteStudio](https://sqlitestudio.pl/)
-   - Con SQLITESTUDIO seleccionan hoteleriapp.db y podrán ver toda la bbdd (Acuérdense que antes tiene que estar inicializado el swagger)
+   - Con SQLITESTUDIO seleccionan hoteleriapp.db y podrán ver toda la base de datos (Asegúrate que antes la aplicación se haya iniciado al menos una vez)
 
 ## Usuarios Predefinidos
 
@@ -144,10 +178,12 @@ Para facilitar las pruebas, la aplicación incluye dos usuarios predefinidos:
 
 ## Solución de Problemas
 
-### Error "No module named 'uvicorn'"
-Si recibes este error, asegúrate de que uvicorn está instalado correctamente:
+### Error "No module named 'uvicorn'" u otros módulos
+Si recibes este error, asegúrate de que uvicorn y todos los requisitos están instalados correctamente:
 ```bash
-pip install uvicorn
+pip install -r requirements.txt
+# o individualmente
+pip install uvicorn fastapi sqlalchemy pydantic python-jose[cryptography] werkzeug python-multipart qrcode pillow
 ```
 
 ### Problemas con la instalación de Pillow
@@ -161,15 +197,15 @@ Si tienes errores de CORS al hacer solicitudes desde tu frontend, asegúrate de:
 
 1. Verificar que la URL de tu API es correcta en las solicitudes del frontend.
 2. Si estás desarrollando en localhost, usa el protocolo `http://` y no `file://`.
-3. Asegúrate de que el origen desde donde haces las solicitudes está permitido:
+3. Asegúrate de que el origen desde donde haces las solicitudes está permitido.
 
 La API permite solicitudes desde los siguientes orígenes por defecto:
 - http://localhost:8000
-- http://localhost:3000 (típico puerto de React)
-- http://localhost:5173 (típico puerto de Vite)
 - http://127.0.0.1:8000
 - http://127.0.0.1:3000
 - http://127.0.0.1:5173
+- http://localhost
+- http://127.0.0.1
 
 Si necesitas permitir solicitudes desde otros orígenes, edita el archivo `app/api.py` y añade tu origen a la lista `origins`.
 
