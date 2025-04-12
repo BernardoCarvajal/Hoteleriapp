@@ -28,7 +28,6 @@ export class AuthGuard implements CanActivate, CanActivateChild {
         if (isAuthenticated) {
           return true;
         }
-        
         // Guarda la URL que el usuario intentaba acceder
         this.router.navigate(['/login'], {
           queryParams: { returnUrl: state.url }
