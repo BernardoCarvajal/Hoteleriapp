@@ -1,0 +1,101 @@
+/* login.component.css */
+.login-container {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(135deg, #3f51b5 0%, #7986cb 100%);
+    padding: 20px;
+  }
+  
+  mat-card {
+    width: 100%;
+    max-width: 400px;
+    padding: 2em;
+    border-radius: 12px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+    background-color: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  mat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+  }
+  
+  .full-width {
+    width: 100%;
+    margin-bottom: 1.5em;
+  }
+  
+  .button-container {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 2em;
+  }
+  
+  mat-card-header {
+    justify-content: center;
+    margin-bottom: 2em;
+  }
+  
+  mat-card-title {
+    font-size: 28px;
+    font-weight: 500;
+    color: #3f51b5;
+    margin: 0;
+    letter-spacing: 0.5px;
+  }
+  
+  mat-form-field {
+    margin-bottom: 1.5em;
+  }
+  
+  button[mat-raised-button] {
+    padding: 0 2em;
+    height: 48px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    border-radius: 24px;
+    transition: all 0.3s ease;
+  }
+  
+  button[mat-stroked-button] {
+    padding: 0 2em;
+    height: 48px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    border-radius: 24px;
+    transition: all 0.3s ease;
+  }
+  
+  button[mat-raised-button]:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(63, 81, 181, 0.3);
+  }
+  
+  button[mat-stroked-button]:hover {
+    background-color: rgba(63, 81, 181, 0.05);
+  }
+  
+  mat-icon {
+    color: #757575;
+  }
+  
+  /* Estilos para dispositivos móviles */
+  @media (max-width: 480px) {
+    mat-card {
+      padding: 1.5em;
+    }
+    
+    .button-container {
+      flex-direction: column;
+      gap: 1em;
+    }
+    
+    button[mat-raised-button], 
+    button[mat-stroked-button] {
+      width: 100%;
+    }
+  }

@@ -1,0 +1,138 @@
+/* registro.component.css */
+.login-container {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(135deg, #3f51b5 0%, #7986cb 100%);
+    padding: 1rem;
+    box-sizing: border-box;
+    overflow-y: auto;
+  }
+  
+  mat-card {
+    width: 100%;
+    max-width: 450px;
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+    background-color: rgba(255, 255, 255, 0.98);
+    margin: 1rem 0;
+  }
+  
+  mat-card-header {
+    justify-content: center;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #eee;
+    margin-bottom: 1.5rem;
+  }
+  
+  mat-card-title {
+    font-size: 1.5rem;
+    color: #3f51b5;
+    margin: 0;
+    font-weight: 500;
+  }
+  
+  mat-form-field {
+    width: 100%;
+    margin-bottom: 0.5rem;
+  }
+  
+  .full-width {
+    width: 100%;
+  }
+  
+  /* Ajustes para los inputs */
+  ::ng-deep .mat-form-field-wrapper {
+    margin-bottom: 0.5rem !important;
+    padding-bottom: 0.5rem !important;
+  }
+  
+  ::ng-deep .mat-form-field-appearance-outline .mat-form-field-infix {
+    padding: 0.5em 0;
+  }
+  
+  /* Ajustes para los iconos */
+  mat-icon[matPrefix] {
+    margin-right: 0.5rem;
+    color: #666;
+  }
+  
+  /* Contenedor de botones */
+  .button-container {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1.5rem;
+    justify-content: space-between;
+  }
+  
+  /* Estilos de los botones */
+  button[mat-raised-button],
+  button[mat-stroked-button] {
+    flex: 1;
+    padding: 0.5rem;
+    height: 42px;
+    border-radius: 21px;
+    font-weight: 500;
+  }
+  
+  button[mat-raised-button] {
+    background-color: #3f51b5;
+  }
+  
+  button[mat-stroked-button] {
+    border-color: #3f51b5;
+  }
+  
+  /* Responsive design */
+  @media (max-width: 600px) {
+    .login-container {
+      padding: 0.5rem;
+    }
+  
+    mat-card {
+      padding: 1rem;
+      margin: 0;
+    }
+  
+    .button-container {
+      flex-direction: column;
+    }
+  
+    button[mat-raised-button],
+    button[mat-stroked-button] {
+      width: 100%;
+    }
+  
+    mat-card-title {
+      font-size: 1.25rem;
+    }
+  }
+  
+  /* Ajustes para pantallas muy pequeñas */
+  @media (max-height: 700px) {
+    .login-container {
+      align-items: flex-start;
+      padding-top: 1rem;
+    }
+  
+    mat-card {
+      margin: 0;
+    }
+  }
+  
+  /* Ajustes para evitar desbordamiento */
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  ::ng-deep .mat-form-field-flex {
+    align-items: center;
+  }
+  
+  ::ng-deep .mat-form-field-appearance-outline .mat-form-field-outline {
+    background-color: white;
+  }
