@@ -37,6 +37,7 @@ def create_app() -> FastAPI:
         "http://127.0.0.1:5173",
         "http://localhost:4200",
         "http://127.0.0.1:4200",
+        "https://hoteleriapp-1.onrender.com",
         # Añade aquí otros orígenes que necesites permitir
     ]
 
