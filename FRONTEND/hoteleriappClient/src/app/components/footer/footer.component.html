@@ -1,1 +1,26 @@
-<p>footer works!</p>
+<footer class="footer">
+  <div class="footer-content">
+    <div class="footer-section">
+      <h3>Hoteleriapp</h3>
+      <p>Sistema de gestión hotelera para administrar reservas, usuarios y reportes.</p>
+    </div>
+    
+    <div class="footer-section">
+      <h3>Enlaces rápidos</h3>
+      <ul>
+        <li><a routerLink="/">Inicio</a></li>
+        <li><a routerLink="/reservas">Reservas</a></li>
+        <li><a routerLink="/reportes">Reportes</a></li>
+        <li><a routerLink="/login">Iniciar sesión</a></li>
+      </ul>
+    </div>
+    
+    <div class="footer-section">
+      <p><mat-icon>location_on</mat-icon> Santiago, Chile</p>
+    </div>
+  </div>
+  
+  <div class="footer-bottom">
+    <p>&copy; {{currentYear}} Hoteleriapp. Todos los derechos reservados.</p>
+  </div>
+</footer>

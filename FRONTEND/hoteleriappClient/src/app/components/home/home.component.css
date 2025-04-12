@@ -1,0 +1,123 @@
+/* Estilos generales */
+.home-container {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Welcome Section */
+.welcome-section {
+  text-align: center;
+  margin-bottom: 40px;
+  padding: 20px;
+  background-color: #f5f5f5;
+  border-radius: 8px;
+}
+
+.welcome-title {
+  font-size: 2.5rem;
+  color: #1976d2;
+  margin-bottom: 10px;
+}
+
+.welcome-text {
+  font-size: 1.2rem;
+  color: #555;
+}
+
+/* Features Section */
+.features-section {
+  margin-bottom: 40px;
+}
+
+.section-title {
+  text-align: center;
+  font-size: 1.8rem;
+  color: #333;
+  margin-bottom: 30px;
+}
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+}
+
+.feature-item {
+  padding: 20px;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  transition: transform 0.3s ease;
+}
+
+.feature-item:hover {
+  transform: translateY(-5px);
+}
+
+.feature-item mat-icon {
+  font-size: 2.5rem;
+  height: 2.5rem;
+  width: 2.5rem;
+  color: #1976d2;
+  margin-bottom: 15px;
+}
+
+.feature-item h3 {
+  font-size: 1.3rem;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.feature-item p {
+  color: #666;
+  line-height: 1.5;
+}
+
+/* Action Section */
+.action-section {
+  text-align: center;
+  padding: 30px;
+  background-color: #f5f5f5;
+  border-radius: 8px;
+}
+
+.action-text {
+  font-size: 1.2rem;
+  margin-bottom: 20px;
+  color: #555;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .welcome-title {
+    font-size: 2rem;
+  }
+  
+  .section-title {
+    font-size: 1.5rem;
+  }
+  
+  .features-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.welcome-section,
+.features-section,
+.action-section {
+  animation: fadeIn 1s ease-out;
+}

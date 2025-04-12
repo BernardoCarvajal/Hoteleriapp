@@ -1,1 +1,77 @@
-<p>header works!</p>
+<!-- src/app/components/header/header.component.html -->
+<mat-toolbar color="primary" class="header">
+    <div class="logo-container">
+      <button mat-icon-button [matMenuTriggerFor]="menu" class="menu-button">
+        <mat-icon>menu</mat-icon>
+      </button>
+      <span class="logo">Hoteleriapp</span>
+    </div>
+  
+    <div class="nav-links">
+      @if (isAuthenticated$ | async) {
+        <button mat-button routerLink="/dashboard">
+          <mat-icon>dashboard</mat-icon>
+          Dashboard
+        </button>
+        <button mat-button routerLink="/reservas">
+          <mat-icon>event</mat-icon>
+          Reservas
+        </button>
+        <button mat-button routerLink="/reportes">
+          <mat-icon>assessment</mat-icon>
+          Reportes
+        </button>
+      }
+    </div>
+  
+    <span class="spacer"></span>
+  
+    <div class="auth-buttons">
+      @if (isAuthenticated$ | async) {
+        <button mat-button (click)="onLogout()">
+          <mat-icon>exit_to_app</mat-icon>
+          Cerrar Sesión
+        </button>
+      } @else {
+        <button mat-button routerLink="/login">
+          <mat-icon>login</mat-icon>
+          Iniciar Sesión
+        </button>
+        <button mat-button routerLink="/registro">
+          <mat-icon>person_add</mat-icon>
+          Registrarse
+        </button>
+      }
+    </div>
+  </mat-toolbar>
+  
+  <mat-menu #menu="matMenu">
+    @if (isAuthenticated$ | async) {
+      <button mat-menu-item routerLink="/dashboard">
+        <mat-icon>dashboard</mat-icon>
+        <span>Dashboard</span>
+      </button>
+      <button mat-menu-item routerLink="/reservas">
+        <mat-icon>event</mat-icon>
+        <span>Reservas</span>
+      </button>
+      <button mat-menu-item routerLink="/reportes">
+        <mat-icon>assessment</mat-icon>
+        <span>Reportes</span>
+      </button>
+      <mat-divider></mat-divider>
+      <button mat-menu-item (click)="onLogout()">
+        <mat-icon>exit_to_app</mat-icon>
+        <span>Cerrar Sesión</span>
+      </button>
+    } @else {
+      <button mat-menu-item routerLink="/login">
+        <mat-icon>login</mat-icon>
+        <span>Iniciar Sesión</span>
+      </button>
+      <button mat-menu-item routerLink="/registro">
+        <mat-icon>person_add</mat-icon>
+        <span>Registrarse</span>
+      </button>
+    }
+  </mat-menu>

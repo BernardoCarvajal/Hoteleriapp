@@ -1,25 +1,51 @@
 import { Injectable } from '@angular/core';
-import { environment } from '../../environments/environment';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { UsuarioRegistro, usuarioLogin } from '../models/usuario.model';
+import { BehaviorSubject, Observable, tap } from 'rxjs';
+import { environment } from '../../environments/environment';
+import { usuarioLogin, LoginResponse, UsuarioRegistro } from '../models/usuario.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
+  private readonly TOKEN_KEY = 'auth_token';
+  private isAuthenticatedSubject = new BehaviorSubject<boolean>(this.hasValidToken());
 
-  private apiUrl = environment.apiUrl;
+  isAuthenticated$ = this.isAuthenticatedSubject.asObservable();
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
-  login(userData: usuarioLogin): Observable<any>{
-    const url = `${this.apiUrl}/usuarios/login`;
-    return this.http.post(url, userData);
+  login(credentials: usuarioLogin): Observable<LoginResponse> {
+    return this.http.post<LoginResponse>(`${environment.apiUrl}/usuarios/login`, credentials)
+      .pipe(
+        tap(response => {
+          this.setSession(response);
+        })
+      );
+  }
+
+  logout(): void {
+    localStorage.removeItem(this.TOKEN_KEY);
+    this.isAuthenticatedSubject.next(false);
+  }
+
+  private setSession(response: LoginResponse): void {
+    localStorage.setItem(this.TOKEN_KEY, response.access_token);
+    this.isAuthenticatedSubject.next(true);
+  }
+
+  getToken(): string | null {
+    return localStorage.getItem(this.TOKEN_KEY);
+  }
+
+  private hasValidToken(): boolean {
+    const token = this.getToken();
+    return !!token;
   }
 
   register(userData: UsuarioRegistro): Observable<any>{
-    const url = `${this.apiUrl}/usuarios/registro`;
+    const url = `${environment.apiUrl}/usuarios/registro`;
     return this.http.post(url, userData);
   }
+
 }

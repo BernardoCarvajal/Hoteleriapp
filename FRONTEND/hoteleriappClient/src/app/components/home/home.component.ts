@@ -4,8 +4,9 @@ import { Component } from '@angular/core';
   selector: 'app-home',
   standalone: false,
   templateUrl: './home.component.html',
-  styleUrl: './home.component.css'
+  styleUrls: ['./home.component.css']
 })
 export class HomeComponent {
-
+  // Componente simple que solo muestra información sobre Hoteleriapp
+  // No necesita lógica adicional
 }

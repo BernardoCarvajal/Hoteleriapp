@@ -1,0 +1,65 @@
+.header {
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  height: 64px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+}
+
+.logo-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.logo {
+  font-size: 1.5rem;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  margin-left: 8px;
+}
+
+.nav-links {
+  display: flex;
+  gap: 16px;
+  margin-left: 32px;
+}
+
+@media (max-width: 768px) {
+  .nav-links {
+    display: none;
+  }
+}
+
+.spacer {
+  flex: 1 1 auto;
+}
+
+.auth-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+@media (max-width: 768px) {
+  .auth-buttons {
+    display: none;
+  }
+}
+
+.menu-button {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .menu-button {
+    display: block;
+  }
+}
+
+button mat-icon {
+  margin-right: 8px;
+}

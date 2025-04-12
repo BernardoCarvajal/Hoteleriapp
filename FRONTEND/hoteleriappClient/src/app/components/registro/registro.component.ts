@@ -35,11 +35,11 @@ export class RegistroComponent {
     if(this.registroForm.valid){
       const formData = this.registroForm.value;
       this.authService.register(formData).subscribe({
-        next: (response) => {
+        next: (response: any) => {
           console.log('Registro exitoso', response);
           this.router.navigate(['/login']);
         },
-        error: (error) => {
+        error: (error: any) => {
           console.error('Error en el registro', error);
           this.snackBar.open('Error en el registro', 'Cerrar', {
             duration: 3000
