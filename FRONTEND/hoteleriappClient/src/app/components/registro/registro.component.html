@@ -72,21 +72,30 @@
           <!-- Contraseña -->
           <mat-form-field appearance="outline" class="full-width">
             <mat-label>Contraseña</mat-label>
-            <input matInput formControlName="password" [type]="hide ? 'password' : 'text'" placeholder="••••••••">
-            <mat-icon matPrefix>lock</mat-icon>
-            <button mat-icon-button matSuffix (click)="hide = !hide" type="button">
-              <mat-icon>{{hide ? 'visibility_off' : 'visibility'}}</mat-icon>
+            <input matInput formControlName="password" [type]="hidePassword ? 'password' : 'text'" placeholder="Mínimo 8 caracteres">
+            <button mat-icon-button matSuffix (click)="hidePassword = !hidePassword" type="button">
+              <mat-icon>{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
             </button>
-            <mat-error *ngIf="registroForm.get('password')?.hasError('required')">
-              La contraseña es requerida
+            <mat-error *ngIf="registroForm.get('password')?.touched && registroForm.get('password')?.invalid">
+              {{ getErrorMessage('password') }}
             </mat-error>
-            <mat-error *ngIf="registroForm.get('password')?.hasError('minlength')">
-              La contraseña debe tener al menos 6 caracteres
+            <mat-hint>La contraseña debe tener al menos 8 caracteres</mat-hint>
+          </mat-form-field>
+  
+          <!-- Confirmar Contraseña -->
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Confirmar Contraseña</mat-label>
+            <input matInput formControlName="confirmPassword" [type]="hideConfirmPassword ? 'password' : 'text'" placeholder="Repite tu contraseña">
+            <button mat-icon-button matSuffix (click)="hideConfirmPassword = !hideConfirmPassword" type="button">
+              <mat-icon>{{hideConfirmPassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+            </button>
+            <mat-error *ngIf="getPasswordMismatchError()">
+              Las contraseñas no coinciden
             </mat-error>
           </mat-form-field>
   
           <div class="button-container">
-            <button mat-raised-button color="primary" type="submit" [disabled]="!registroForm.valid" (click)="onSubmit()">
+            <button mat-raised-button color="primary" type="submit" [disabled]="!registroForm.valid">
               Registrarse
             </button>
             <button mat-stroked-button color="accent" type="button" routerLink="/login">
