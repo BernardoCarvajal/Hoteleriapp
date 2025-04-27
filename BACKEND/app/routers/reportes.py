@@ -137,7 +137,7 @@ async def reporte_ocupacion(
     Obtener reporte de ocupación para una fecha específica (por defecto, hoy)
     """
     # Eliminar referencias a variables que ya no existen
-    print(f"Generando reporte de ocupación")
+    print(f"Generando reporte de ocupación para fecha: {fecha}")
     
     # Si no se proporciona fecha, usar la fecha actual
     if not fecha:
@@ -154,13 +154,22 @@ async def reporte_ocupacion(
         )
     
     # Obtener reservas para la fecha especificada
+    # CORRECCIÓN: Cambiar la condición de fecha_fin para considerar que una habitación está ocupada
+    # solo si la fecha de fin es estrictamente mayor que la fecha consultada
     reservas = db.query(DetalleReservaORM)\
         .join(ReservaORM)\
         .filter(
-            ReservaORM.fecha_inicio <= fecha,
-            ReservaORM.fecha_fin > fecha,
+            ReservaORM.fecha_inicio < fecha + timedelta(days=1),  # Fecha inicio <= fecha consultada
+            ReservaORM.fecha_fin > fecha,                         # Fecha fin > fecha consultada (no cambiado)
             ReservaORM.estado.in_([EstadoReserva.CONFIRMADA.value, EstadoReserva.COMPLETADA.value])
         ).all()
+    
+    # Imprimir información de depuración para ver las reservas encontradas
+    print(f"Reservas encontradas para la fecha {fecha}: {len(reservas)}")
+    for r in reservas:
+        reserva = db.query(ReservaORM).filter(ReservaORM.id == r.reserva_id).first()
+        habitacion = db.query(HabitacionORM).filter(HabitacionORM.id == r.habitacion_id).first()
+        print(f"Reserva ID: {reserva.id}, Habitación: {habitacion.numero}, Fechas: {reserva.fecha_inicio} a {reserva.fecha_fin}")
     
     # Obtener IDs de habitaciones ocupadas
     habitaciones_ocupadas_ids = [r.habitacion_id for r in reservas]
@@ -187,7 +196,7 @@ async def reporte_ocupacion(
             .join(ReservaORM)\
             .join(HabitacionORM)\
             .filter(
-                ReservaORM.fecha_inicio <= fecha,
+                ReservaORM.fecha_inicio < fecha + timedelta(days=1),  # Misma corrección que arriba
                 ReservaORM.fecha_fin > fecha,
                 ReservaORM.estado.in_([EstadoReserva.CONFIRMADA.value, EstadoReserva.COMPLETADA.value]),
                 HabitacionORM.tipo_id == tipo.id
