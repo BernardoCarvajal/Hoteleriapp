@@ -8,6 +8,7 @@ from app.routers.reservas import router as reservas_router
 from app.routers.usuarios import router as usuarios_router
 from app.routers.reportes import router as reportes_router
 from app.routers.configuracion import router as configuracion_router
+from app.routers.roles import router as roles_router
 
 # Importar los modelos Pydantic para incluirlos en el esquema OpenAPI
 from app.models.user import User, UserCreate, UserLogin, UserWithRoles, Token
@@ -104,5 +105,6 @@ def create_app() -> FastAPI:
     app.include_router(usuarios_router, prefix="/api/usuarios", tags=["usuarios"])
     app.include_router(reportes_router, prefix="/api/reportes", tags=["reportes"])
     app.include_router(configuracion_router, prefix="/api/configuracion", tags=["configuracion"])
+    app.include_router(roles_router, prefix="/api/roles", tags=["roles"])
     
     return app 
