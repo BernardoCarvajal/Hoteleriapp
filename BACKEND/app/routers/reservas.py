@@ -15,7 +15,7 @@ from app.models.reserva import (
     EstadoReserva, MetodoPago
 )
 from app.models.habitacion_orm import HabitacionORM, TipoHabitacionORM
-from app.models.reserva_orm import ReservaORM, DetalleReservaORM, PagoORM
+from app.models.reserva_orm import ReservaORM, DetalleReservaORM, PagoORM, EstadoPago
 
 router = APIRouter()
 
@@ -270,7 +270,7 @@ async def realizar_pago(
         monto=pago.monto,
         metodo_pago=pago.metodo_pago,
         referencia_pago=pago.referencia_pago,
-        estado=EstadoReserva.CONFIRMADA.value
+        estado=EstadoPago.COMPLETADO.value
     )
     
     db.add(nuevo_pago)
