@@ -90,7 +90,7 @@ async def prueba_autenticacion(current_user: UserORM = Security(get_current_user
 # Endpoint para obtener la información del perfil de usuario
 @router.get("/perfil", response_model=UserWithRoles)
 async def obtener_perfil(
-    current_user: UserORM = Depends(get_current_user)
+    current_user: UserORM = Security(get_current_user)
 ):
     """
     Obtener perfil del usuario autenticado
@@ -285,7 +285,7 @@ async def asignar_roles(
 # Endpoint que muestra los roles del usuario sin restricciones 
 @router.get("/mis-roles", response_model=Dict[str, List[str]])
 async def verificar_mis_roles(
-    current_user: UserORM = Depends(get_current_user)
+    current_user: UserORM = Security(get_current_user)
 ):
     """
     Obtener la lista de roles del usuario autenticado sin restricciones
