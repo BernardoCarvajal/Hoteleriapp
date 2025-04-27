@@ -12,6 +12,8 @@ from app.models.user import (
     UserCreate, User, UserLogin, UserUpdate, Token, Role, UserWithRoles
 )
 from app.models.user_orm import UserORM, RoleORM, user_role
+from app.models.reserva_orm import ReservaORM, DetalleReservaORM, PagoORM, EstadoReserva
+from app.models.habitacion_orm import HabitacionORM
 from app.config import SECRET_KEY, ALGORITHM
 
 # Definir modelos de respuesta
@@ -304,3 +306,69 @@ async def asignar_roles(
 async def verificar_mis_roles(current_user: UserORM = Security(get_current_user)):
     roles = [role.nombre for role in current_user.roles]
     return {"roles": roles, "id": current_user.id, "email": current_user.email} 
+
+# Endpoint para obtener las reservas del usuario autenticado
+@router.get(
+    "/mis-reservas",
+    response_model=List[Dict[str, Any]],
+    openapi_extra={"security": [{"Bearer": []}]}
+)
+async def obtener_mis_reservas(
+    current_user: UserORM = Security(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Obtener todas las reservas del usuario autenticado
+    """
+    # Consulta de reservas del usuario autenticado
+    reservas = db.query(ReservaORM).filter(ReservaORM.usuario_id == current_user.id).all()
+    
+    if not reservas:
+        return []
+    
+    resultado = []
+    for r in reservas:
+        # Calcular noches de estancia
+        noches = (r.fecha_fin - r.fecha_inicio).days
+        
+        # Obtener detalles y pagos
+        detalles = db.query(DetalleReservaORM).filter(DetalleReservaORM.reserva_id == r.id).all()
+        pagos = db.query(PagoORM).filter(PagoORM.reserva_id == r.id).all()
+        
+        # Calcular totales
+        subtotal = sum(d.precio_por_noche * noches for d in detalles)
+        impuestos = subtotal * 0.21  # 21% IVA
+        total = subtotal + impuestos
+        
+        # Calcular pagado
+        pagado = sum(p.monto for p in pagos)
+        pendiente = total - pagado
+        
+        # Obtener habitaciones
+        habitaciones = []
+        for d in detalles:
+            hab = db.query(HabitacionORM).filter(HabitacionORM.id == d.habitacion_id).first()
+            if hab:
+                habitaciones.append(hab.numero)
+        
+        # Crear objeto de reserva para la respuesta
+        reserva_data = {
+            "id": r.id,
+            "codigo_reserva": r.codigo_reserva,
+            "fecha_inicio": r.fecha_inicio,
+            "fecha_fin": r.fecha_fin,
+            "estado": r.estado,
+            "numero_huespedes": r.numero_huespedes,
+            "noches": noches,
+            "habitaciones": habitaciones,
+            "subtotal": subtotal,
+            "impuestos": impuestos,
+            "total": total,
+            "pagado": pagado,
+            "pendiente": pendiente,
+            "fecha_creacion": r.fecha_creacion
+        }
+        
+        resultado.append(reserva_data)
+    
+    return resultado 
