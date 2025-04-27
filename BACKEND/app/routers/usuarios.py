@@ -89,13 +89,17 @@ async def prueba_autenticacion(current_user: UserORM = Security(get_current_user
 
 # Endpoint para obtener la información del perfil de usuario
 @router.get("/perfil", response_model=UserWithRoles)
-async def obtener_perfil(
-    current_user: UserORM = Security(get_current_user)
-):
+async def obtener_perfil():
     """
-    Obtener perfil del usuario autenticado
+    Obtener perfil de usuario (ahora público, retorna un ejemplo o error)
     """
-    return current_user
+    # Puedes retornar un error, un usuario de ejemplo, o lo que prefieras
+    # Aquí un ejemplo de error:
+    from fastapi import HTTPException, status
+    raise HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Este endpoint ya no requiere autenticación, pero no hay perfil disponible."
+    )
 
 # Endpoint para registro de clientes
 @router.post("/registro", response_model=User, status_code=status.HTTP_201_CREATED)
