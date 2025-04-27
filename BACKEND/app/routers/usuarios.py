@@ -260,6 +260,56 @@ async def registro_empleado(
     
     return db_usuario
 
+# Endpoint para registrar administradores
+@router.post(
+    "/admin", 
+    response_model=UserWithRoles, 
+    status_code=status.HTTP_201_CREATED
+)
+async def registro_administrador(
+    usuario: UserCreate,
+    db: Session = Depends(get_db)
+):
+    """
+    Registrar un nuevo administrador
+    """
+    # Verificar si el email ya existe
+    usuario_existente = db.query(UserORM).filter(UserORM.email == usuario.email).first()
+    if usuario_existente:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Este email ya está registrado"
+        )
+    
+    # Crear nuevo usuario con rol administrador
+    hashed_password = generate_password_hash(usuario.password)
+    
+    # Asignar rol de administrador
+    rol_admin = db.query(RoleORM).filter(RoleORM.nombre == "admin").first()
+    if not rol_admin:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Rol 'admin' no encontrado"
+        )
+    
+    db_usuario = UserORM(
+        nombre=usuario.nombre,
+        apellido=usuario.apellido,
+        email=usuario.email,
+        password_hash=hashed_password,
+        telefono=usuario.telefono,
+        documento_identidad=usuario.documento_identidad,
+        es_activo=True
+    )
+    
+    db_usuario.roles.append(rol_admin)
+    
+    db.add(db_usuario)
+    db.commit()
+    db.refresh(db_usuario)
+    
+    return db_usuario
+
 # Endpoint para asignar roles (solo administradores)
 @router.put(
     "/{usuario_id}/roles", 
