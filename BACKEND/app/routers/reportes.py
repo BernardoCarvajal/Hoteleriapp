@@ -122,7 +122,7 @@ async def reporte_reservas(
     "/ocupacion", 
     response_model=ReporteOcupacion,
     summary="Obtener reporte de ocupación",
-    description="Obtiene un reporte de ocupación de habitaciones para un rango de fechas",
+    description="Obtiene un reporte de ocupación de habitaciones para una fecha específica",
     responses={
         401: {"description": "No autenticado"},
         403: {"description": "No autorizado"},
@@ -130,31 +130,20 @@ async def reporte_reservas(
     }
 )
 async def reporte_ocupacion(
-    fecha_inicio: Optional[date] = None,
-    fecha_fin: Optional[date] = None,
+    fecha: Optional[date] = None,
     db: Session = Depends(get_db)
 ):
     """
-    Obtener reporte de ocupación para un rango de fechas (por defecto, solo el día de hoy)
+    Obtener reporte de ocupación para una fecha específica (por defecto, hoy)
     """
-    print(f"Generando reporte de ocupación por rango: {fecha_inicio} - {fecha_fin}")
+    # Eliminar referencias a variables que ya no existen
+    print(f"Generando reporte de ocupación")
     
-    # Si no se proporciona fecha de inicio, usar la fecha actual
-    if not fecha_inicio:
-        fecha_inicio = date.today()
+    # Si no se proporciona fecha, usar la fecha actual
+    if not fecha:
+        fecha = date.today()
     
-    # Si no se proporciona fecha de fin, usar la misma fecha de inicio
-    if not fecha_fin:
-        fecha_fin = fecha_inicio
-    
-    # Asegurar que fecha_fin no sea anterior a fecha_inicio
-    if fecha_fin < fecha_inicio:
-        fecha_fin = fecha_inicio
-    
-    # Calcular la cantidad de días en el rango
-    dias = (fecha_fin - fecha_inicio).days + 1
-    
-    # Obtener todas las habitaciones activas
+    # Obtener todas las habitaciones
     todas_habitaciones = db.query(HabitacionORM).filter(HabitacionORM.esta_activa == True).all()
     total_habitaciones = len(todas_habitaciones)
     
@@ -164,47 +153,26 @@ async def reporte_ocupacion(
             detail="No se encontraron habitaciones activas en el sistema"
         )
     
-    # Inicializar datos generales
-    total_ocupadas = 0
-    ocupacion_diaria = {}
+    # Obtener reservas para la fecha especificada
+    reservas = db.query(DetalleReservaORM)\
+        .join(ReservaORM)\
+        .filter(
+            ReservaORM.fecha_inicio <= fecha,
+            ReservaORM.fecha_fin > fecha,
+            ReservaORM.estado.in_([EstadoReserva.CONFIRMADA.value, EstadoReserva.COMPLETADA.value])
+        ).all()
     
-    # Para cada día en el rango, calcular la ocupación
-    current_date = fecha_inicio
-    while current_date <= fecha_fin:
-        # Obtener reservas para la fecha actual
-        reservas = db.query(DetalleReservaORM)\
-            .join(ReservaORM)\
-            .filter(
-                ReservaORM.fecha_inicio <= current_date,
-                ReservaORM.fecha_fin > current_date,
-                ReservaORM.estado.in_([EstadoReserva.CONFIRMADA.value, EstadoReserva.COMPLETADA.value])
-            ).all()
-        
-        # Obtener IDs de habitaciones ocupadas para el día
-        habitaciones_ocupadas_ids = [r.habitacion_id for r in reservas]
-        habitaciones_ocupadas_dia = len(habitaciones_ocupadas_ids)
-        
-        # Sumar al total de ocupadas (para el promedio)
-        total_ocupadas += habitaciones_ocupadas_dia
-        
-        # Calcular porcentaje de ocupación del día
-        porcentaje_ocupacion_dia = (habitaciones_ocupadas_dia / total_habitaciones) * 100 if total_habitaciones > 0 else 0
-        
-        # Guardar en ocupación diaria
-        fecha_str = current_date.isoformat()
-        ocupacion_diaria[fecha_str] = porcentaje_ocupacion_dia
-        
-        # Avanzar al siguiente día
-        current_date += timedelta(days=1)
+    # Obtener IDs de habitaciones ocupadas
+    habitaciones_ocupadas_ids = [r.habitacion_id for r in reservas]
+    habitaciones_ocupadas = len(habitaciones_ocupadas_ids)
     
-    # Calcular promedio de ocupación para todo el período
-    promedio_ocupacion = total_ocupadas / (total_habitaciones * dias) * 100 if total_habitaciones > 0 and dias > 0 else 0
+    # Calcular habitaciones disponibles
+    habitaciones_disponibles = total_habitaciones - habitaciones_ocupadas
     
-    # Calcular habitaciones ocupadas (promedio) y disponibles
-    habitaciones_ocupadas_promedio = total_ocupadas / dias if dias > 0 else 0
-    habitaciones_disponibles_promedio = total_habitaciones - habitaciones_ocupadas_promedio
+    # Calcular porcentaje de ocupación
+    ocupacion_porcentaje = (habitaciones_ocupadas / total_habitaciones) * 100 if total_habitaciones > 0 else 0
     
-    # Calcular desglose por tipo de habitación (para todo el período)
+    # Calcular desglose por tipo de habitación
     tipos_habitacion = db.query(TipoHabitacionORM).all()
     desglose_por_tipo = {}
     
@@ -214,50 +182,33 @@ async def reporte_ocupacion(
             .filter(HabitacionORM.tipo_id == tipo.id, HabitacionORM.esta_activa == True)\
             .count()
         
-        if total_por_tipo == 0:
-            continue
+        # Habitaciones ocupadas por tipo
+        ocupadas_por_tipo = db.query(DetalleReservaORM)\
+            .join(ReservaORM)\
+            .join(HabitacionORM)\
+            .filter(
+                ReservaORM.fecha_inicio <= fecha,
+                ReservaORM.fecha_fin > fecha,
+                ReservaORM.estado.in_([EstadoReserva.CONFIRMADA.value, EstadoReserva.COMPLETADA.value]),
+                HabitacionORM.tipo_id == tipo.id
+            ).count()
         
-        # Inicializar contadores
-        dias_ocupacion = 0
-        
-        # Para cada día, contar ocupadas por tipo
-        current_date = fecha_inicio
-        while current_date <= fecha_fin:
-            # Habitaciones ocupadas por tipo para el día actual
-            ocupadas_por_tipo_dia = db.query(DetalleReservaORM)\
-                .join(ReservaORM)\
-                .join(HabitacionORM)\
-                .filter(
-                    ReservaORM.fecha_inicio <= current_date,
-                    ReservaORM.fecha_fin > current_date,
-                    ReservaORM.estado.in_([EstadoReserva.CONFIRMADA.value, EstadoReserva.COMPLETADA.value]),
-                    HabitacionORM.tipo_id == tipo.id
-                ).count()
-            
-            dias_ocupacion += ocupadas_por_tipo_dia
-            
-            # Avanzar al siguiente día
-            current_date += timedelta(days=1)
-        
-        # Calcular promedios para el tipo
-        ocupadas_promedio = dias_ocupacion / dias if dias > 0 else 0
-        disponibles_promedio = total_por_tipo - ocupadas_promedio
-        porcentaje_promedio = (ocupadas_promedio / total_por_tipo) * 100 if total_por_tipo > 0 else 0
+        # Calcular disponibles y porcentaje
+        disponibles_por_tipo = total_por_tipo - ocupadas_por_tipo
+        porcentaje_por_tipo = (ocupadas_por_tipo / total_por_tipo) * 100 if total_por_tipo > 0 else 0
         
         desglose_por_tipo[tipo.nombre] = {
             "total": total_por_tipo,
-            "ocupadas": round(ocupadas_promedio, 2),
-            "disponibles": round(disponibles_promedio, 2),
-            "porcentaje": round(porcentaje_promedio, 2)
+            "ocupadas": ocupadas_por_tipo,
+            "disponibles": disponibles_por_tipo,
+            "porcentaje_ocupacion": porcentaje_por_tipo
         }
     
     return ReporteOcupacion(
-        fecha_inicio=fecha_inicio,
-        fecha_fin=fecha_fin,
-        ocupacion_porcentaje=round(promedio_ocupacion, 2),
+        fecha=fecha,
+        ocupacion_porcentaje=ocupacion_porcentaje,
         habitaciones_totales=total_habitaciones,
-        habitaciones_ocupadas=round(habitaciones_ocupadas_promedio, 2),
-        habitaciones_disponibles=round(habitaciones_disponibles_promedio, 2),
-        desglose_por_tipo=desglose_por_tipo,
-        ocupacion_diaria=ocupacion_diaria
+        habitaciones_ocupadas=habitaciones_ocupadas,
+        habitaciones_disponibles=habitaciones_disponibles,
+        desglose_por_tipo=desglose_por_tipo
     ) 

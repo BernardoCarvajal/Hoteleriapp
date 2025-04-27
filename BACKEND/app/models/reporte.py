@@ -33,11 +33,9 @@ class ReporteReservas(BaseModel):
     reservas: List[ReporteReserva]
 
 class ReporteOcupacion(BaseModel):
-    fecha_inicio: date
-    fecha_fin: date
+    fecha: date
     ocupacion_porcentaje: float
     habitaciones_totales: int
     habitaciones_ocupadas: int
     habitaciones_disponibles: int
-    desglose_por_tipo: Dict[str, Any]
-    ocupacion_diaria: Dict[str, float] 
+    desglose_por_tipo: Dict[str, Any] 
