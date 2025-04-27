@@ -355,7 +355,7 @@ async def asignar_roles(
 )
 async def verificar_mis_roles(current_user: UserORM = Security(get_current_user)):
     roles = [role.nombre for role in current_user.roles]
-    return {"roles": roles, "id": current_user.id, "email": current_user.email} 
+    return {"roles": roles, "id": current_user.id, "email": current_user.email}
 
 # Endpoint para obtener las reservas del usuario autenticado
 @router.get(
@@ -421,4 +421,110 @@ async def obtener_mis_reservas(
         
         resultado.append(reserva_data)
     
-    return resultado 
+    return resultado
+
+# Endpoint para obtener todos los usuarios (solo administradores)
+@router.get(
+    "", 
+    response_model=List[UserWithRoles],
+    openapi_extra={"security": [{"Bearer": []}]}
+)
+async def obtener_usuarios(
+    current_user: UserORM = Security(get_admin_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Obtener todos los usuarios (solo administradores)
+    """
+    usuarios = db.query(UserORM).all()
+    return usuarios
+
+# Endpoint para obtener un usuario por ID (solo administradores)
+@router.get(
+    "/{usuario_id}", 
+    response_model=UserWithRoles,
+    openapi_extra={"security": [{"Bearer": []}]}
+)
+async def obtener_usuario(
+    usuario_id: int,
+    current_user: UserORM = Security(get_admin_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Obtener un usuario por ID (solo administradores)
+    """
+    usuario = db.query(UserORM).filter(UserORM.id == usuario_id).first()
+    if not usuario:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Usuario con ID {usuario_id} no encontrado"
+        )
+    return usuario
+
+# Endpoint para actualizar un usuario (solo administradores)
+@router.put(
+    "/{usuario_id}", 
+    response_model=UserWithRoles,
+    openapi_extra={"security": [{"Bearer": []}]}
+)
+async def actualizar_usuario(
+    usuario_id: int,
+    usuario_update: UserUpdate,
+    current_user: UserORM = Security(get_admin_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Actualizar un usuario (solo administradores)
+    """
+    db_usuario = db.query(UserORM).filter(UserORM.id == usuario_id).first()
+    if not db_usuario:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Usuario con ID {usuario_id} no encontrado"
+        )
+    
+    # Actualizar campos que vienen en la solicitud
+    update_data = usuario_update.dict(exclude_unset=True)
+    
+    for key, value in update_data.items():
+        setattr(db_usuario, key, value)
+    
+    db.commit()
+    db.refresh(db_usuario)
+    
+    return db_usuario
+
+# Endpoint para eliminar un usuario (solo administradores)
+@router.delete(
+    "/{usuario_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    openapi_extra={"security": [{"Bearer": []}]}
+)
+async def eliminar_usuario(
+    usuario_id: int,
+    current_user: UserORM = Security(get_admin_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Eliminar un usuario (solo administradores)
+    """
+    # Verificar que no se intente eliminar al usuario autenticado
+    if current_user.id == usuario_id:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="No se puede eliminar el usuario autenticado"
+        )
+    
+    # Buscar usuario
+    usuario = db.query(UserORM).filter(UserORM.id == usuario_id).first()
+    if not usuario:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Usuario con ID {usuario_id} no encontrado"
+        )
+    
+    # Eliminar usuario
+    db.delete(usuario)
+    db.commit()
+    
+    return None 
