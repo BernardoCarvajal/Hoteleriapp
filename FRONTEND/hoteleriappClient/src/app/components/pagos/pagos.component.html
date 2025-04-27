@@ -1,0 +1,72 @@
+<mat-card class="pago-card">
+  <mat-card-header>
+    <mat-card-title>Ventanilla de Pago</mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+    <!-- Información de la reserva -->
+    <div class="reserva-info">
+      <p *ngIf="data?.habitacion">
+        Habitación <strong>{{ data.habitacion.numero }}</strong> - {{ data.habitacion.tipo }}
+      </p>
+      <p>
+        <strong>Fechas:</strong> {{ formatearFecha(data?.fecha_inicio) }} a {{ formatearFecha(data?.fecha_fin) }}
+      </p>
+      <p>
+        <strong>Huéspedes:</strong> {{ data?.numHuespedes || 1 }}
+      </p>
+    </div>
+
+    <!-- Información del costo -->
+    <div class="costo-container">
+      <div *ngIf="calculandoCosto" class="cargando-costo">
+        <mat-icon class="spin">autorenew</mat-icon>
+        <span>Calculando costo...</span>
+      </div>
+      <div *ngIf="!calculandoCosto && costoReserva" class="detalle-costo">
+        <h3>Detalle del costo</h3>
+        <div class="costo-item">
+          <span>Subtotal:</span>
+          <strong>{{ costoReserva.subtotal | currency:'USD':'symbol':'1.2-2' }}</strong>
+        </div>
+        <div class="costo-item">
+          <span>Impuestos:</span>
+          <strong>{{ costoReserva.impuestos | currency:'USD':'symbol':'1.2-2' }}</strong>
+        </div>
+        <div class="costo-item total">
+          <span>Total a pagar:</span>
+          <strong>{{ costoReserva.total | currency:'USD':'symbol':'1.2-2' }}</strong>
+        </div>
+      </div>
+    </div>
+
+    <!-- Formulario de pago -->
+    <form #pagoForm="ngForm" (ngSubmit)="pagar()" *ngIf="!calculandoCosto && costoReserva">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Número de tarjeta</mat-label>
+        <input matInput type="text" name="numero" [(ngModel)]="numero" maxlength="19" required placeholder="1234 5678 9012 3456">
+      </mat-form-field>
+      <mat-form-field appearance="outline" class="half-width">
+        <mat-label>Fecha de expiración</mat-label>
+        <input matInput type="text" name="expiracion" [(ngModel)]="expiracion" maxlength="5" required placeholder="MM/AA">
+      </mat-form-field>
+      <mat-form-field appearance="outline" class="half-width">
+        <mat-label>CVV</mat-label>
+        <input matInput type="password" name="cvv" [(ngModel)]="cvv" maxlength="4" required placeholder="123">
+      </mat-form-field>
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Nombre en la tarjeta</mat-label>
+        <input matInput type="text" name="nombre" [(ngModel)]="nombre" required>
+      </mat-form-field>
+      <div class="pago-actions">
+        <button mat-raised-button color="primary" type="submit" [disabled]="!pagoForm.valid || cargando">
+          <mat-icon *ngIf="cargando" class="spin">autorenew</mat-icon>
+          Pagar {{ costoReserva.total | currency:'USD':'symbol':'1.2-2' }}
+        </button>
+      </div>
+      <mat-error *ngIf="error">{{ error }}</mat-error>
+      <div *ngIf="exito" style="color: green; margin-top: 10px;">
+        ¡Pago realizado con éxito!
+      </div>
+    </form>
+  </mat-card-content>
+</mat-card>

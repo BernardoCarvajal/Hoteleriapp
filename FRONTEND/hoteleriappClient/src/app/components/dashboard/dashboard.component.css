@@ -1,0 +1,263 @@
+.dashboard-container {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+h1 {
+  color: #3f51b5;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+h2 {
+  color: #424242;
+  margin: 20px 0;
+}
+
+h3 {
+  color: #616161;
+  margin: 25px 0 15px;
+}
+
+/* Navegación con botones en lugar de tabs */
+.navegacion-tabs {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-bottom: 25px;
+}
+
+.navegacion-tabs button {
+  padding: 8px 16px;
+  font-size: 16px;
+  min-width: 200px;
+}
+
+.navegacion-tabs button.tab-activo {
+  background-color: #3f51b5;
+  color: white;
+}
+
+.tab-content {
+  padding: 20px 0;
+}
+
+.filtros-card {
+  margin-bottom: 20px;
+}
+
+.filtros-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 15px;
+}
+
+.filtro-ocupacion {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.filtros-botones {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+  justify-content: flex-end;
+}
+
+.dashboard-resumen-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.resumen-card {
+  text-align: center;
+}
+
+.resumen-valor {
+  font-size: 24px;
+  font-weight: bold;
+  color: #3f51b5;
+  margin-bottom: 5px;
+}
+
+.resumen-label {
+  color: #757575;
+  font-size: 14px;
+}
+
+.cargando-contenedor {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 30px;
+  gap: 10px;
+}
+
+.error-mensaje {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background-color: #ffebee;
+  color: #f44336;
+  padding: 10px 15px;
+  border-radius: 4px;
+  margin: 20px 0;
+}
+
+.tabla-contenedor {
+  overflow-x: auto;
+}
+
+.reservas-tabla {
+  width: 100%;
+}
+
+.mat-row:hover {
+  background-color: #f5f5f5;
+}
+
+.estado-chip {
+  padding: 4px 8px;
+  border-radius: 16px;
+  font-size: 12px;
+  font-weight: 500;
+  display: inline-block;
+}
+
+.estado-pendiente {
+  background-color: #fff9c4;
+  color: #fbc02d;
+}
+
+.estado-confirmada {
+  background-color: #e8f5e9;
+  color: #4caf50;
+}
+
+.estado-cancelada {
+  background-color: #ffebee;
+  color: #f44336;
+}
+
+.estado-completada {
+  background-color: #e3f2fd;
+  color: #2196f3;
+}
+
+.habitacion-chip {
+  background-color: #e0e0e0;
+  padding: 3px 8px;
+  border-radius: 4px;
+  margin: 2px;
+  display: inline-block;
+  font-size: 12px;
+}
+
+.sin-datos {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  color: #757575;
+  background-color: #f5f5f5;
+  border-radius: 4px;
+  margin-top: 20px;
+  gap: 10px;
+}
+
+/* Estilos para el reporte de ocupación */
+.ocupacion-indicador-contenedor {
+  display: flex;
+  justify-content: center;
+  margin: 30px 0;
+}
+
+.ocupacion-indicador {
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  background-color: #e8f5e9;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border: 8px solid #4caf50;
+}
+
+.ocupacion-porcentaje {
+  font-size: 42px;
+  font-weight: bold;
+  color: #2e7d32;
+}
+
+.ocupacion-label {
+  font-size: 16px;
+  color: #388e3c;
+  margin-top: 5px;
+}
+
+.desglose-tipos {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 15px;
+  margin-bottom: 30px;
+}
+
+.tipo-card {
+  background-color: #f5f5f5;
+}
+
+.tipo-datos {
+  margin-top: 10px;
+  line-height: 1.6;
+}
+
+.tipo-label {
+  font-weight: 500;
+  color: #757575;
+  display: inline-block;
+  width: 100px;
+}
+
+.tipo-valor {
+  font-weight: bold;
+  color: #3f51b5;
+}
+
+@media (max-width: 768px) {
+  .filtros-grid, .filtro-ocupacion {
+    grid-template-columns: 1fr;
+    flex-direction: column;
+  }
+  
+  .dashboard-resumen-cards, .desglose-tipos {
+    grid-template-columns: 1fr;
+  }
+  
+  .filtros-botones {
+    flex-direction: column;
+  }
+  
+  .ocupacion-indicador {
+    width: 150px;
+    height: 150px;
+  }
+  
+  .ocupacion-porcentaje {
+    font-size: 32px;
+  }
+  
+  .navegacion-tabs {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .navegacion-tabs button {
+    width: 100%;
+    max-width: 300px;
+  }
+} 

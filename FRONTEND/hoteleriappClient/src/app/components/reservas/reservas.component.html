@@ -1,1 +1,151 @@
-<p>reservas works!</p>
+<div class="reserva-container">
+  <!-- Vista de búsqueda de reservas -->
+  <div *ngIf="!viendoMisReservas">
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title>Consultar disponibilidad</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="acciones-mis-reservas" style="margin-bottom: 16px;">
+          <button mat-stroked-button color="primary" (click)="verMisReservas()">
+            <mat-icon>assignment</mat-icon>
+            Ver Mis Reservas
+          </button>
+        </div>
+        <form (ngSubmit)="buscarDisponibilidad()" class="reserva-form">
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Fecha de llegada</mat-label>
+              <input matInput [matDatepicker]="picker1"
+                     [(ngModel)]="fechaLlegada"
+                     (ngModelChange)="setFechaLlegada($event)"
+                     name="fechaLlegada"
+                     required
+                     [min]="minFechaLlegada">
+              <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
+              <mat-datepicker #picker1></mat-datepicker>
+            </mat-form-field>
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Fecha de salida</mat-label>
+              <input matInput [matDatepicker]="picker2" [(ngModel)]="fechaSalida" name="fechaSalida" required [min]="minFechaSalida">
+              <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
+              <mat-datepicker #picker2></mat-datepicker>
+            </mat-form-field>
+          </div>
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Número de huéspedes</mat-label>
+              <input matInput type="number" [(ngModel)]="numHuespedes" name="numHuespedes" min="1" required>
+            </mat-form-field>
+          </div>
+          <div class="form-row">
+            <button mat-raised-button color="primary" type="submit" [disabled]="buscando">
+              <mat-icon *ngIf="buscando" class="spin">autorenew</mat-icon>
+              Buscar
+            </button>
+          </div>
+        </form>
+        <mat-error *ngIf="error">{{ error }}</mat-error>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card *ngIf="habitacionesDisponibles.length > 0" class="result-card" style="background: none; box-shadow: none;">
+      <mat-card-header>
+        <mat-card-title>Habitaciones disponibles</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="habitaciones-grid">
+          <mat-card *ngFor="let hab of habitacionesDisponibles" class="habitacion-card">
+            <img mat-card-image [src]="getImagenHabitacion(hab.tipo)" alt="Imagen habitación {{ hab.tipo }}">
+            <mat-card-header>
+              <mat-icon mat-card-avatar color="primary">hotel</mat-icon>
+              <mat-card-title>Habitación {{ hab.numero }}</mat-card-title>
+              <mat-card-subtitle>{{ hab.tipo }}</mat-card-subtitle>
+            </mat-card-header>
+            <mat-card-content>
+              <p><strong>Capacidad:</strong> {{ hab.capacidad }}</p>
+              <p *ngIf="hab.precio_por_noche">
+                <strong>Precio:</strong> {{ hab.precio_por_noche | currency:'USD':'symbol':'1.2-2' }}
+              </p>
+              <p *ngIf="hab.descripcion"><strong>Descripción:</strong> {{ hab.descripcion }}</p>
+            </mat-card-content>
+            <mat-card-actions>
+              <button mat-raised-button color="accent" (click)="abrirPago(hab)">
+                <mat-icon>event_available</mat-icon>
+                Reservar
+              </button>
+            </mat-card-actions>
+          </mat-card>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card *ngIf="!buscando && habitacionesDisponibles.length === 0 && fechaLlegada && fechaSalida" class="result-card">
+      <mat-card-content>
+        <p>No hay habitaciones disponibles para los criterios seleccionados.</p>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- Vista de mis reservas -->
+  <div *ngIf="viendoMisReservas">
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title>Mis Reservas</mat-card-title>
+        <button mat-button color="primary" (click)="volverABuscar()">
+          <mat-icon>arrow_back</mat-icon>
+          Volver a buscar habitaciones
+        </button>
+      </mat-card-header>
+      <mat-card-content>
+        <div *ngIf="misReservas.length === 0">
+          <p>No tienes reservas registradas.</p>
+        </div>
+        <div *ngIf="misReservas.length > 0" class="reservas-lista">
+          <mat-card *ngFor="let reserva of misReservas" class="reserva-item">
+            <mat-card-header>
+              <mat-icon mat-card-avatar color="primary">hotel</mat-icon>
+              <mat-card-title>Reserva #{{ reserva.codigo_reserva }}</mat-card-title>
+              <mat-card-subtitle>
+                <span class="estado-badge" [ngClass]="'estado-' + reserva.estado">
+                  {{ reserva.estado | titlecase }}
+                </span>
+              </mat-card-subtitle>
+            </mat-card-header>
+            <mat-card-content>
+              <div class="info-reserva">
+                <div class="info-section">
+                  <p><strong>Fechas:</strong> {{ formatearFecha(reserva.fecha_inicio) }} a {{ formatearFecha(reserva.fecha_fin) }}</p>
+                  <p><strong>Duración:</strong> {{ reserva.noches }} {{ reserva.noches === 1 ? 'noche' : 'noches' }}</p>
+                  <p><strong>Huéspedes:</strong> {{ reserva.numero_huespedes }}</p>
+                </div>
+                <div class="info-section">
+                  <p><strong>Habitaciones:</strong> {{ reserva.habitaciones ? reserva.habitaciones.join(', ') : '' }}</p>
+                  <p><strong>Subtotal:</strong> {{ reserva.subtotal | currency:'USD':'symbol':'1.2-2' }}</p>
+                  <p><strong>Impuestos:</strong> {{ reserva.impuestos | currency:'USD':'symbol':'1.2-2' }}</p>
+                </div>
+              </div>
+              <div class="totales-reserva">
+                <p><strong>Total:</strong> {{ reserva.total | currency:'USD':'symbol':'1.2-2' }}</p>
+                <p><strong>Pagado:</strong> {{ reserva.pagado | currency:'USD':'symbol':'1.2-2' }}</p>
+                <p><strong>Pendiente:</strong> <span [ngClass]="{'pendiente-pago': reserva.pendiente > 0}">{{ reserva.pendiente | currency:'USD':'symbol':'1.2-2' }}</span></p>
+              </div>
+            </mat-card-content>
+            <mat-card-actions *ngIf="reserva.pendiente > 0">
+              <button mat-raised-button color="accent">
+                <mat-icon>payment</mat-icon>
+                Completar Pago
+              </button>
+            </mat-card-actions>
+            <mat-card-actions *ngIf="reserva.pendiente === 0 || reserva.pagado > 0">
+              <button mat-raised-button color="primary" (click)="verTicket(reserva)">
+                <mat-icon>receipt</mat-icon>
+                Ver Ticket de pago
+              </button>
+            </mat-card-actions>
+          </mat-card>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

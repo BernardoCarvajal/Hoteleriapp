@@ -1,0 +1,269 @@
+<div class="dashboard-container">
+  <h1>Panel de Reportes</h1>
+
+  <!-- Navegación entre reportes mediante botones -->
+  <div class="navegacion-tabs">
+    <button mat-raised-button 
+            [class.tab-activo]="tabActivo === 'reservas'" 
+            (click)="cambiarTab('reservas')">
+      <mat-icon>receipt</mat-icon> Reporte de Reservas
+    </button>
+    <button mat-raised-button 
+            [class.tab-activo]="tabActivo === 'ocupacion'" 
+            (click)="cambiarTab('ocupacion')">
+      <mat-icon>hotel</mat-icon> Reporte de Ocupación
+    </button>
+  </div>
+
+  <!-- Contenido del reporte de reservas -->
+  <div class="tab-content" *ngIf="tabActivo === 'reservas'">
+    <!-- Formulario de filtros de reservas -->
+    <mat-card class="filtros-card">
+      <mat-card-header>
+        <mat-card-title>Filtros</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <form [formGroup]="filtroForm" (ngSubmit)="cargarReporte()">
+          <div class="filtros-grid">
+            <mat-form-field appearance="fill">
+              <mat-label>Fecha Inicio</mat-label>
+              <input matInput [matDatepicker]="pickerInicio" formControlName="fechaInicio" [max]="maxFecha">
+              <mat-datepicker-toggle matSuffix [for]="pickerInicio"></mat-datepicker-toggle>
+              <mat-datepicker #pickerInicio></mat-datepicker>
+            </mat-form-field>
+
+            <mat-form-field appearance="fill">
+              <mat-label>Fecha Fin</mat-label>
+              <input matInput [matDatepicker]="pickerFin" formControlName="fechaFin" [max]="maxFecha">
+              <mat-datepicker-toggle matSuffix [for]="pickerFin"></mat-datepicker-toggle>
+              <mat-datepicker #pickerFin></mat-datepicker>
+            </mat-form-field>
+
+            <mat-form-field appearance="fill">
+              <mat-label>Estado</mat-label>
+              <mat-select formControlName="estado">
+                <mat-option value="">Todos</mat-option>
+                <mat-option value="pendiente">Pendiente</mat-option>
+                <mat-option value="confirmada">Confirmada</mat-option>
+                <mat-option value="cancelada">Cancelada</mat-option>
+                <mat-option value="completada">Completada</mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="fill">
+              <mat-label>ID Cliente</mat-label>
+              <input matInput formControlName="clienteId" type="number" min="1">
+            </mat-form-field>
+          </div>
+
+          <div class="filtros-botones">
+            <button type="submit" mat-raised-button color="primary">
+              <mat-icon>search</mat-icon> Filtrar
+            </button>
+            <button type="button" mat-stroked-button (click)="limpiarFiltros()">
+              <mat-icon>clear</mat-icon> Limpiar
+            </button>
+            <button type="button" mat-raised-button color="accent" (click)="exportarCSV()"
+              [disabled]="!reporteReservas || reporteReservas.reservas.length === 0">
+              <mat-icon>file_download</mat-icon> Exportar CSV
+            </button>
+          </div>
+        </form>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Tarjetas de resumen de reservas -->
+    <div class="dashboard-resumen-cards" *ngIf="reporteReservas">
+      <mat-card class="resumen-card">
+        <mat-card-content>
+          <div class="resumen-valor">{{reporteReservas.total_reservas}}</div>
+          <div class="resumen-label">Total Reservas</div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="resumen-card">
+        <mat-card-content>
+          <div class="resumen-valor">{{formatearMoneda(reporteReservas.ingresos_totales)}}</div>
+          <div class="resumen-label">Ingresos Totales</div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="resumen-card">
+        <mat-card-content>
+          <div class="resumen-valor">{{formatearMoneda(reporteReservas.ingresos_pendientes)}}</div>
+          <div class="resumen-label">Pagos Pendientes</div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <!-- Tabla de reservas -->
+    <div class="tabla-contenedor" *ngIf="reporteReservas && reporteReservas.reservas.length > 0">
+      <h2>Listado de Reservas</h2>
+      <table mat-table [dataSource]="dataSource" class="mat-elevation-z8 reservas-tabla">
+        
+        <!-- Columna de código -->
+        <ng-container matColumnDef="codigo">
+          <th mat-header-cell *matHeaderCellDef> Código </th>
+          <td mat-cell *matCellDef="let reserva"> {{reserva.codigo_reserva}} </td>
+        </ng-container>
+
+        <!-- Columna de cliente -->
+        <ng-container matColumnDef="cliente">
+          <th mat-header-cell *matHeaderCellDef> Cliente </th>
+          <td mat-cell *matCellDef="let reserva"> {{reserva.cliente}} </td>
+        </ng-container>
+
+        <!-- Columna de fechas -->
+        <ng-container matColumnDef="fechas">
+          <th mat-header-cell *matHeaderCellDef> Fechas </th>
+          <td mat-cell *matCellDef="let reserva"> 
+            <div>Desde: {{formatearFecha(reserva.fecha_inicio)}}</div>
+            <div>Hasta: {{formatearFecha(reserva.fecha_fin)}}</div>
+          </td>
+        </ng-container>
+
+        <!-- Columna de estado -->
+        <ng-container matColumnDef="estado">
+          <th mat-header-cell *matHeaderCellDef> Estado </th>
+          <td mat-cell *matCellDef="let reserva"> 
+            <span class="estado-chip" [ngClass]="obtenerClaseEstado(reserva.estado)">
+              {{reserva.estado}}
+            </span>
+          </td>
+        </ng-container>
+
+        <!-- Columna de habitaciones -->
+        <ng-container matColumnDef="habitaciones">
+          <th mat-header-cell *matHeaderCellDef> Habitaciones </th>
+          <td mat-cell *matCellDef="let reserva"> 
+            <span *ngFor="let hab of reserva.habitaciones" class="habitacion-chip">
+              {{hab}}
+            </span>
+          </td>
+        </ng-container>
+
+        <!-- Columna de pagos -->
+        <ng-container matColumnDef="pagos">
+          <th mat-header-cell *matHeaderCellDef> Pagos </th>
+          <td mat-cell *matCellDef="let reserva"> 
+            <div>Pagado: {{formatearMoneda(reserva.total_pagado)}}</div>
+            <div>Pendiente: {{formatearMoneda(reserva.total_pendiente)}}</div>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="columnas"></tr>
+        <tr mat-row *matRowDef="let row; columns: columnas;"></tr>
+      </table>
+    </div>
+
+    <!-- Mensaje sin datos de reservas -->
+    <div *ngIf="reporteReservas && reporteReservas.reservas.length === 0" class="sin-datos">
+      <mat-icon>info</mat-icon>
+      <span>No se encontraron reservas con los criterios seleccionados</span>
+    </div>
+  </div>
+
+  <!-- Contenido del reporte de ocupación -->
+  <div class="tab-content" *ngIf="tabActivo === 'ocupacion'">
+    <!-- Formulario de filtros de ocupación -->
+    <mat-card class="filtros-card">
+      <mat-card-header>
+        <mat-card-title>Seleccionar Fecha</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <form [formGroup]="filtroOcupacionForm" (ngSubmit)="cargarReporteOcupacion()">
+          <div class="filtro-ocupacion">
+            <mat-form-field appearance="fill">
+              <mat-label>Fecha</mat-label>
+              <input matInput [matDatepicker]="pickerOcupacion" formControlName="fecha">
+              <mat-datepicker-toggle matSuffix [for]="pickerOcupacion"></mat-datepicker-toggle>
+              <mat-datepicker #pickerOcupacion></mat-datepicker>
+            </mat-form-field>
+
+            <button type="submit" mat-raised-button color="primary">
+              <mat-icon>search</mat-icon> Consultar
+            </button>
+          </div>
+        </form>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Resumen de ocupación -->
+    <div *ngIf="reporteOcupacion">
+      <h2>Reporte de Ocupación - {{formatearFecha(reporteOcupacion.fecha)}}</h2>
+      
+      <!-- Indicador de ocupación -->
+      <div class="ocupacion-indicador-contenedor">
+        <div class="ocupacion-indicador">
+          <div class="ocupacion-porcentaje">{{reporteOcupacion.ocupacion_porcentaje.toFixed(2)}}%</div>
+          <div class="ocupacion-label">de ocupación</div>
+        </div>
+      </div>
+
+      <!-- Tarjetas de resumen de ocupación -->
+      <div class="dashboard-resumen-cards">
+        <mat-card class="resumen-card">
+          <mat-card-content>
+            <div class="resumen-valor">{{reporteOcupacion.habitaciones_totales}}</div>
+            <div class="resumen-label">Total Habitaciones</div>
+          </mat-card-content>
+        </mat-card>
+
+        <mat-card class="resumen-card">
+          <mat-card-content>
+            <div class="resumen-valor">{{reporteOcupacion.habitaciones_ocupadas}}</div>
+            <div class="resumen-label">Habitaciones Ocupadas</div>
+          </mat-card-content>
+        </mat-card>
+
+        <mat-card class="resumen-card">
+          <mat-card-content>
+            <div class="resumen-valor">{{reporteOcupacion.habitaciones_disponibles}}</div>
+            <div class="resumen-label">Habitaciones Disponibles</div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+
+      <!-- Desglose por tipo de habitación -->
+      <h3>Desglose por Tipo de Habitación</h3>
+      <div class="desglose-tipos">
+        <mat-card *ngFor="let tipo of obtenerTiposHabitacion()" class="tipo-card">
+          <mat-card-header>
+            <mat-card-title>{{tipo}}</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="tipo-datos">
+              <div>
+                <span class="tipo-label">Total:</span> 
+                <span class="tipo-valor">{{reporteOcupacion.desglose_por_tipo[tipo].total || 0}}</span>
+              </div>
+              <div>
+                <span class="tipo-label">Ocupadas:</span> 
+                <span class="tipo-valor">{{reporteOcupacion.desglose_por_tipo[tipo].ocupadas || 0}}</span>
+              </div>
+              <div>
+                <span class="tipo-label">Disponibles:</span> 
+                <span class="tipo-valor">{{reporteOcupacion.desglose_por_tipo[tipo].disponibles || 0}}</span>
+              </div>
+              <div>
+                <span class="tipo-label">Ocupación:</span> 
+                <span class="tipo-valor">{{reporteOcupacion.desglose_por_tipo[tipo].porcentaje || 0}}%</span>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </div>
+  </div>
+
+  <!-- Estado de carga y errores (común para ambos reportes) -->
+  <div *ngIf="cargando" class="cargando-contenedor">
+    <mat-spinner diameter="40"></mat-spinner>
+    <span>Cargando datos...</span>
+  </div>
+
+  <div *ngIf="error" class="error-mensaje">
+    <mat-icon color="warn">error</mat-icon>
+    <span>{{error}}</span>
+  </div>
+</div> 

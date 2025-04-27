@@ -21,6 +21,12 @@
           <mat-icon>assessment</mat-icon>
           Reportes
         </button>
+        @if (isAdmin()) {
+          <button mat-button routerLink="/admin">
+            <mat-icon>admin_panel_settings</mat-icon>
+            Administración
+          </button>
+        }
       }
     </div>
   
@@ -59,6 +65,12 @@
         <mat-icon>assessment</mat-icon>
         <span>Reportes</span>
       </button>
+      @if (isAdmin()) {
+        <button mat-menu-item routerLink="/admin">
+          <mat-icon>admin_panel_settings</mat-icon>
+          <span>Administración</span>
+        </button>
+      }
       <mat-divider></mat-divider>
       <button mat-menu-item (click)="onLogout()">
         <mat-icon>exit_to_app</mat-icon>

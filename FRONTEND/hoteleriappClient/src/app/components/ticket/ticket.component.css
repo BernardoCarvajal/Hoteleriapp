@@ -1,0 +1,160 @@
+.ticket-container {
+  padding: 20px;
+  font-family: 'Arial', sans-serif;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.ticket-header {
+  text-align: center;
+  margin-bottom: 20px;
+  border-bottom: 2px dashed #ddd;
+  padding-bottom: 15px;
+}
+
+.ticket-header h2 {
+  margin: 0;
+  color: #333;
+  font-size: 24px;
+}
+
+.codigo {
+  font-size: 14px;
+  margin-top: 10px;
+  color: #555;
+}
+
+.cargando, .error-mensaje {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 30px 20px;
+  color: #555;
+  text-align: center;
+  flex-direction: column;
+}
+
+.spin {
+  animation: spin 1s linear infinite;
+  margin-bottom: 10px;
+  font-size: 30px;
+  height: 30px;
+  width: 30px;
+}
+
+@keyframes spin {
+  100% { transform: rotate(360deg); }
+}
+
+.error-mensaje {
+  color: #f44336;
+}
+
+.ticket-content {
+  margin-bottom: 20px;
+}
+
+.qr-section {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.qr-code {
+  width: 150px;
+  height: 150px;
+  border: 1px solid #ddd;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.qr-info {
+  margin-top: 10px;
+  font-size: 12px;
+  color: #666;
+}
+
+.detalles-reserva, .info-pago {
+  border: 1px solid #eee;
+  border-radius: 4px;
+  padding: 15px;
+  margin-bottom: 20px;
+}
+
+.detalle-item {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  padding-bottom: 5px;
+  border-bottom: 1px solid #f5f5f5;
+}
+
+.label {
+  font-weight: bold;
+  color: #555;
+}
+
+.value {
+  text-align: right;
+}
+
+.total {
+  font-size: 16px;
+  font-weight: 500;
+  border-top: 1px solid #e0e0e0;
+  padding-top: 10px;
+  margin-top: 10px;
+}
+
+.info-pago h3 {
+  margin-top: 0;
+  border-bottom: 1px solid #e0e0e0;
+  padding-bottom: 8px;
+  margin-bottom: 15px;
+  color: #333;
+}
+
+.pendiente-pago {
+  color: #f44336;
+  font-weight: bold;
+}
+
+.estado-badge {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: white;
+  display: inline-block;
+}
+
+.estado-pendiente {
+  background-color: #ff9800;
+}
+
+.estado-confirmada {
+  background-color: #4caf50;
+}
+
+.estado-cancelada {
+  background-color: #f44336;
+}
+
+.estado-completada {
+  background-color: #2196f3;
+}
+
+.instrucciones {
+  font-size: 14px;
+  color: #666;
+  font-style: italic;
+  margin-bottom: 20px;
+  padding: 10px;
+  background-color: #f9f9f9;
+  border-radius: 4px;
+}
+
+.ticket-actions {
+  display: flex;
+  justify-content: space-between;
+  padding-top: 15px;
+  border-top: 2px dashed #ddd;
+} 

@@ -1,0 +1,98 @@
+.reserva-container {
+    max-width: 700px;
+    margin: 30px auto;
+  }
+  
+  .reserva-form .form-row {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+  
+  .full-width {
+    flex: 1;
+  }
+  
+  .result-card {
+    margin-top: 24px;
+  }
+  
+  .spin {
+    animation: spin 1s linear infinite;
+    vertical-align: middle;
+  }
+  
+  @keyframes spin {
+    100% { transform: rotate(360deg); }
+  }
+
+  .habitaciones-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    justify-content: flex-start;
+  }
+  
+  .habitacion-card {
+    width: 270px;
+    min-width: 220px;
+    margin-bottom: 16px;
+  }
+
+  /* Estilos para la lista de reservas */
+  .reservas-lista {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .reserva-item {
+    margin-bottom: 16px;
+  }
+
+  .info-reserva {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px;
+    margin-top: 16px;
+  }
+
+  .info-section {
+    flex: 1;
+    min-width: 200px;
+  }
+
+  .totales-reserva {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid #eee;
+  }
+
+  .estado-badge {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    color: white;
+  }
+
+  .estado-pendiente {
+    background-color: #ff9800;
+  }
+
+  .estado-confirmada {
+    background-color: #4caf50;
+  }
+
+  .estado-cancelada {
+    background-color: #f44336;
+  }
+
+  .estado-completada {
+    background-color: #2196f3;
+  }
+
+  .pendiente-pago {
+    color: #f44336;
+    font-weight: bold;
+  }

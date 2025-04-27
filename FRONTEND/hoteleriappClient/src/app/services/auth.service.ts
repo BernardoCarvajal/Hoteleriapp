@@ -48,4 +48,8 @@ export class AuthService {
     return this.http.post(url, userData);
   }
 
+  getPerfil(): Observable<any> {
+    return this.http.get<any>(`${environment.apiUrl}/usuarios/perfil`);
+  }
+
 }
