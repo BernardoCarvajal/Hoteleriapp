@@ -5,6 +5,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime, timedelta
 from jose import jwt, JWTError
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from pydantic import BaseModel
 
 from app.database import get_db
 from app.models.user import (
@@ -13,10 +14,22 @@ from app.models.user import (
 from app.models.user_orm import UserORM, RoleORM, user_role
 from app.config import SECRET_KEY, ALGORITHM
 
+# Definir modelos de respuesta
+class JsonResponse(BaseModel):
+    mensaje: str
+    user_id: str
+    email: str
+    roles: str
+
+class RolesResponse(BaseModel):
+    roles: List[str]
+    id: int
+    email: str
+
 router = APIRouter()
 
-# Configurar el esquema de seguridad
-security = HTTPBearer()
+# Configurar el esquema de seguridad globalmente
+security = HTTPBearer(auto_error=True, description="Bearer authentication token (JWT)")
 
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
@@ -75,11 +88,11 @@ async def get_admin_user(current_user: UserORM = Security(get_current_user), db:
     return current_user
 
 # Endpoint simple para probar la autenticación
-@router.get("/prueba-auth", response_model=Dict[str, str])
+@router.get(
+    "/prueba-auth",
+    openapi_extra={"security": [{"Bearer": []}]}
+)
 async def prueba_autenticacion(current_user: UserORM = Security(get_current_user)):
-    """
-    Endpoint simple para probar la autenticación
-    """
     return {
         "mensaje": f"Autenticación exitosa para {current_user.email}",
         "user_id": str(current_user.id),
@@ -88,7 +101,7 @@ async def prueba_autenticacion(current_user: UserORM = Security(get_current_user
     }
 
 # Endpoint para obtener la información del perfil de usuario
-@router.get("/perfil", response_model=UserWithRoles)
+@router.get("/perfil", response_model=UserWithRoles, openapi_extra={"security": [{"Bearer": []}]})
 async def obtener_perfil(
     current_user: UserORM = Security(get_current_user)
 ):
@@ -283,12 +296,11 @@ async def asignar_roles(
     return usuario
 
 # Endpoint que muestra los roles del usuario sin restricciones 
-@router.get("/mis-roles", response_model=Dict[str, List[str]])
-async def verificar_mis_roles(
-    current_user: UserORM = Security(get_current_user)
-):
-    """
-    Obtener la lista de roles del usuario autenticado sin restricciones
-    """
+@router.get(
+    "/mis-roles",
+    response_model=Dict[str, Any],
+    openapi_extra={"security": [{"Bearer": []}]}
+)
+async def verificar_mis_roles(current_user: UserORM = Security(get_current_user)):
     roles = [role.nombre for role in current_user.roles]
     return {"roles": roles, "id": current_user.id, "email": current_user.email} 
