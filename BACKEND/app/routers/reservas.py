@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, status, Depends, Query
+from fastapi import APIRouter, HTTPException, status, Depends, Query, Security
 from typing import List, Optional
 from sqlalchemy.orm import Session
 from datetime import date, datetime, timedelta
@@ -16,6 +16,7 @@ from app.models.reserva import (
 )
 from app.models.habitacion_orm import HabitacionORM, TipoHabitacionORM
 from app.models.reserva_orm import ReservaORM, DetalleReservaORM, PagoORM, EstadoPago
+from app.routers.usuarios import get_current_user
 
 router = APIRouter()
 
@@ -89,9 +90,10 @@ async def consultar_disponibilidad(
     return resultado
 
 # Endpoint para registrar una reserva
-@router.post("", response_model=Reserva, status_code=status.HTTP_201_CREATED)
+@router.post("", response_model=Reserva, status_code=status.HTTP_201_CREATED, openapi_extra={"security": [{"Bearer": []}]})
 async def crear_reserva(
     reserva: ReservaCreate,
+    current_user = Security(get_current_user),
     db: Session = Depends(get_db)
 ):
     """
@@ -102,7 +104,7 @@ async def crear_reserva(
     
     # Crear objeto de reserva
     nueva_reserva = ReservaORM(
-        usuario_id=1,  # Por ahora usamos un usuario fijo (se cambiará cuando implementemos autenticación)
+        usuario_id=current_user.id,  # Usar el ID del usuario autenticado
         fecha_inicio=reserva.fecha_inicio,
         fecha_fin=reserva.fecha_fin,
         numero_huespedes=reserva.numero_huespedes,
