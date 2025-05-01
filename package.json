@@ -1,6 +1,0 @@
-{
-  "dependencies": {
-    "@angular/animations": "^19.2.8",
-    "@angular/localize": "^19.2.9"
-  }
-}
