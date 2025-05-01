@@ -1,89 +1,91 @@
 <!-- src/app/components/header/header.component.html -->
 <mat-toolbar color="primary" class="header">
-    <div class="logo-container">
-      <button mat-icon-button [matMenuTriggerFor]="menu" class="menu-button">
-        <mat-icon>menu</mat-icon>
-      </button>
-      <span class="logo">Hoteleriapp</span>
-    </div>
-  
-    <div class="nav-links">
-      @if (isAuthenticated$ | async) {
-        <button mat-button routerLink="/dashboard">
-          <mat-icon>dashboard</mat-icon>
-          Dashboard
-        </button>
-        <button mat-button routerLink="/reservas">
-          <mat-icon>event</mat-icon>
-          Reservas
-        </button>
-        <button mat-button routerLink="/reportes">
-          <mat-icon>assessment</mat-icon>
-          Reportes
-        </button>
-        @if (isAdmin()) {
-          <button mat-button routerLink="/admin">
-            <mat-icon>admin_panel_settings</mat-icon>
-            Administración
-          </button>
-        }
-      }
-    </div>
-  
-    <span class="spacer"></span>
-  
-    <div class="auth-buttons">
-      @if (isAuthenticated$ | async) {
-        <button mat-button (click)="onLogout()">
-          <mat-icon>exit_to_app</mat-icon>
-          Cerrar Sesión
-        </button>
-      } @else {
-        <button mat-button routerLink="/login">
-          <mat-icon>login</mat-icon>
-          Iniciar Sesión
-        </button>
-        <button mat-button routerLink="/registro">
-          <mat-icon>person_add</mat-icon>
-          Registrarse
-        </button>
-      }
-    </div>
-  </mat-toolbar>
-  
-  <mat-menu #menu="matMenu">
+  <div class="logo-container">
+    <button mat-icon-button [matMenuTriggerFor]="menu" class="menu-button">
+      <mat-icon>menu</mat-icon>
+    </button>
+    <span class="logo">Hoteleriapp</span>
+  </div>
+
+  <div class="nav-links">
     @if (isAuthenticated$ | async) {
-      <button mat-menu-item routerLink="/dashboard">
-        <mat-icon>dashboard</mat-icon>
-        <span>Dashboard</span>
-      </button>
-      <button mat-menu-item routerLink="/reservas">
-        <mat-icon>event</mat-icon>
-        <span>Reservas</span>
-      </button>
-      <button mat-menu-item routerLink="/reportes">
-        <mat-icon>assessment</mat-icon>
-        <span>Reportes</span>
-      </button>
-      @if (isAdmin()) {
-        <button mat-menu-item routerLink="/admin">
-          <mat-icon>admin_panel_settings</mat-icon>
-          <span>Administración</span>
-        </button>
-      }
-      <mat-divider></mat-divider>
-      <button mat-menu-item (click)="onLogout()">
-        <mat-icon>exit_to_app</mat-icon>
-        <span>Cerrar Sesión</span>
-      </button>
+    <button mat-button routerLink="/dashboard">
+      <mat-icon>dashboard</mat-icon>
+      {{ "COMMON.DASHBOARD" | translate }}
+    </button>
+    <button mat-button routerLink="/reservas">
+      <mat-icon>event</mat-icon>
+      {{ "COMMON.RESERVATIONS" | translate }}
+    </button>
+    @if (isAdmin()) {
+    <button mat-button routerLink="/admin">
+      <mat-icon>admin_panel_settings</mat-icon>
+      {{ "COMMON.ADMIN" | translate }}
+    </button>
+    } }
+  </div>
+
+  <span class="spacer"></span>
+
+  <div class="language-selector">
+    <button mat-button [matMenuTriggerFor]="languageMenu">
+      <mat-icon>language</mat-icon>
+      {{ currentLanguage === "es" ? "Español" : "English" }}
+    </button>
+    <mat-menu #languageMenu="matMenu">
+      <button mat-menu-item (click)="changeLanguage('es')">Español</button>
+      <button mat-menu-item (click)="changeLanguage('en')">English</button>
+    </mat-menu>
+  </div>
+
+  <div class="auth-buttons">
+    @if (isAuthenticated$ | async) {
+    <button mat-button (click)="onLogout()">
+      <mat-icon>exit_to_app</mat-icon>
+      {{ "COMMON.LOGOUT" | translate }}
+    </button>
     } @else {
-      <button mat-menu-item routerLink="/login">
-        <mat-icon>login</mat-icon>
-        <span>Iniciar Sesión</span>
-      </button>
-      <button mat-menu-item routerLink="/registro">
-        <mat-icon>person_add</mat-icon>
-        <span>Registrarse</span>
-      </button>
+    <button mat-button routerLink="/login">
+      <mat-icon>login</mat-icon>
+      {{ "COMMON.LOGIN" | translate }}
+    </button>
+    <button mat-button routerLink="/registro">
+      <mat-icon>person_add</mat-icon>
+      {{ "COMMON.REGISTER" | translate }}
+    </button>
     }
-  </mat-menu>
+  </div>
+</mat-toolbar>
+
+<mat-menu #menu="matMenu">
+  @if (isAuthenticated$ | async) {
+  <button mat-menu-item routerLink="/dashboard">
+    <mat-icon>dashboard</mat-icon>
+    <span>{{ "COMMON.DASHBOARD" | translate }}</span>
+  </button>
+  <button mat-menu-item routerLink="/reservas">
+    <mat-icon>event</mat-icon>
+    <span>{{ "COMMON.RESERVATIONS" | translate }}</span>
+  </button>
+  @if (isAdmin()) {
+  <button mat-menu-item routerLink="/admin">
+    <mat-icon>admin_panel_settings</mat-icon>
+    <span>{{ "COMMON.ADMIN" | translate }}</span>
+  </button>
+  }
+  <mat-divider></mat-divider>
+  <button mat-menu-item (click)="onLogout()">
+    <mat-icon>exit_to_app</mat-icon>
+    <span>{{ "COMMON.LOGOUT" | translate }}</span>
+  </button>
+  } @else {
+  <button mat-menu-item routerLink="/login">
+    <mat-icon>login</mat-icon>
+    <span>{{ "COMMON.LOGIN" | translate }}</span>
+  </button>
+  <button mat-menu-item routerLink="/registro">
+    <mat-icon>person_add</mat-icon>
+    <span>{{ "COMMON.REGISTER" | translate }}</span>
+  </button>
+  }
+</mat-menu>

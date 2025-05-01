@@ -1,41 +1,46 @@
 <div class="home-container">
   <section class="welcome-section">
-    <h1 class="welcome-title">Bienvenido a Hoteleriapp</h1>
-    <p class="welcome-text">Tu sistema integral para la gestión hotelera</p>
+    <h1 class="welcome-title">
+      {{ "COMMON.WELCOME" | translate }}
+      {{ "COMMON.TO" | translate }} Hoteleriapp
+    </h1>
+    <p class="welcome-text">{{ "HOME.SUBTITLE" | translate }}</p>
   </section>
 
   <section class="features-section">
-    <h2 class="section-title">¿Qué puedes hacer con Hoteleriapp?</h2>
-    
+    <h2 class="section-title">{{ "HOME.FEATURES_TITLE" | translate }}</h2>
+
     <div class="features-grid">
       <div class="feature-item">
         <mat-icon>hotel</mat-icon>
-        <h3>Gestión de Habitaciones</h3>
-        <p>Administra el inventario de habitaciones, su disponibilidad y estado.</p>
+        <h3>{{ "HOME.ROOM_MANAGEMENT" | translate }}</h3>
+        <p>{{ "HOME.ROOM_MANAGEMENT_DESC" | translate }}</p>
       </div>
-      
+
       <div class="feature-item">
         <mat-icon>event</mat-icon>
-        <h3>Reservas</h3>
-        <p>Gestiona reservas, check-ins y check-outs de manera eficiente.</p>
+        <h3>{{ "HOME.RESERVATIONS" | translate }}</h3>
+        <p>{{ "HOME.RESERVATIONS_DESC" | translate }}</p>
       </div>
-      
+
       <div class="feature-item">
         <mat-icon>payments</mat-icon>
-        <h3>Pagos</h3>
-        <p>Procesa pagos y genera facturas para tus clientes.</p>
+        <h3>{{ "HOME.PAYMENTS" | translate }}</h3>
+        <p>{{ "HOME.PAYMENTS_DESC" | translate }}</p>
       </div>
-      
+
       <div class="feature-item">
         <mat-icon>analytics</mat-icon>
-        <h3>Reportes</h3>
-        <p>Obtén estadísticas y reportes sobre ocupación y rendimiento.</p>
+        <h3>{{ "HOME.REPORTS" | translate }}</h3>
+        <p>{{ "HOME.REPORTS_DESC" | translate }}</p>
       </div>
     </div>
   </section>
 
   <section class="action-section">
-    <p class="action-text">Comienza a gestionar tu hotel de manera eficiente</p>
-    <button mat-raised-button color="primary" routerLink="/dashboard">Ir al Dashboard</button>
+    <p class="action-text">{{ "HOME.ACTION_TEXT" | translate }}</p>
+    <button mat-raised-button color="primary" routerLink="/dashboard">
+      {{ "HOME.GO_TO_DASHBOARD" | translate }}
+    </button>
   </section>
 </div>

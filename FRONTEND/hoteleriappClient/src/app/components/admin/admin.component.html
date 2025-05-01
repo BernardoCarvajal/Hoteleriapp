@@ -2,182 +2,271 @@
   <mat-card>
     <mat-card-header>
       <mat-card-title>
-        <h2>Panel de Administración</h2>
+        <h2>{{ "ADMIN.TITLE" | translate }}</h2>
       </mat-card-title>
     </mat-card-header>
-    
+
     <mat-card-content>
       <!-- Alerta de mensajes -->
       @if (mensaje) {
-        <mat-card appearance="outlined" class="mb-3" [ngClass]="{'mat-error': tipoMensaje === 'danger', 'mat-accent': tipoMensaje === 'success', 'mat-primary': tipoMensaje === 'info'}">
-          <mat-card-content class="d-flex justify-content-between align-items-center">
-            <span>{{ mensaje }}</span>
-            <button mat-icon-button (click)="mensaje=''">
-              <mat-icon>close</mat-icon>
-            </button>
-          </mat-card-content>
-        </mat-card>
+      <mat-card
+        appearance="outlined"
+        class="mb-3"
+        [ngClass]="{
+          'mat-error': tipoMensaje === 'danger',
+          'mat-accent': tipoMensaje === 'success',
+          'mat-primary': tipoMensaje === 'info'
+        }"
+      >
+        <mat-card-content
+          class="d-flex justify-content-between align-items-center"
+        >
+          <span>{{ mensaje }}</span>
+          <button mat-icon-button (click)="mensaje = ''">
+            <mat-icon>close</mat-icon>
+          </button>
+        </mat-card-content>
+      </mat-card>
       }
 
       <!-- Sección de Gestión de Usuarios -->
       <mat-card class="mb-4">
-        <mat-card-header class="d-flex justify-content-between align-items-center mb-3">
+        <mat-card-header
+          class="d-flex justify-content-between align-items-center mb-3"
+        >
           <mat-card-title>
-            <h3>Usuarios</h3>
+            <h3>{{ "ADMIN.USERS" | translate }}</h3>
           </mat-card-title>
-          <button mat-raised-button color="primary" (click)="toggleFormulario()">
-            <mat-icon>{{ mostrarFormulario ? 'close' : 'add' }}</mat-icon>
-            {{ mostrarFormulario ? 'Cancelar' : 'Nuevo Empleado' }}
+          <button
+            mat-raised-button
+            color="primary"
+            (click)="toggleFormulario()"
+          >
+            <mat-icon>{{ mostrarFormulario ? "close" : "add" }}</mat-icon>
+            {{
+              mostrarFormulario
+                ? ("ADMIN.CANCEL" | translate)
+                : ("ADMIN.NEW_EMPLOYEE" | translate)
+            }}
           </button>
         </mat-card-header>
-        
+
         <mat-card-content>
           <!-- Formulario de creación de empleado -->
           @if (mostrarFormulario) {
-            <div class="mb-4">
-              <h4>Crear Nuevo Empleado</h4>
-              <form [formGroup]="formularioEmpleado" (submit)="crearEmpleado()">
-                <div class="row">
-                  <div class="col-md-6">
-                    <mat-form-field appearance="outline" class="w-100 mb-3">
-                      <mat-label>Nombre</mat-label>
-                      <input matInput formControlName="nombre">
-                      <mat-error *ngIf="nombreNoValido">
-                        El nombre es obligatorio y debe tener al menos 3 caracteres
-                      </mat-error>
-                    </mat-form-field>
-                  </div>
-                  
-                  <div class="col-md-6">
-                    <mat-form-field appearance="outline" class="w-100 mb-3">
-                      <mat-label>Apellido</mat-label>
-                      <input matInput formControlName="apellido">
-                      <mat-error *ngIf="apellidoNoValido">
-                        El apellido es obligatorio y debe tener al menos 3 caracteres
-                      </mat-error>
-                    </mat-form-field>
-                  </div>
+          <div class="mb-4">
+            <h4>{{ "ADMIN.CREATE_EMPLOYEE" | translate }}</h4>
+            <form [formGroup]="formularioEmpleado" (submit)="crearEmpleado()">
+              <div class="row">
+                <div class="col-md-6">
+                  <mat-form-field appearance="outline" class="w-100 mb-3">
+                    <mat-label>{{ "ADMIN.NAME" | translate }}</mat-label>
+                    <input matInput formControlName="nombre" />
+                    <mat-error *ngIf="nombreNoValido">
+                      {{ "ADMIN.NAME_ERROR" | translate }}
+                    </mat-error>
+                  </mat-form-field>
                 </div>
-                
-                <mat-form-field appearance="outline" class="w-100 mb-3">
-                  <mat-label>Correo Electrónico</mat-label>
-                  <input matInput formControlName="email" type="email">
-                  <mat-icon matSuffix>email</mat-icon>
-                  <mat-error *ngIf="emailNoValido">
-                    Ingrese un correo electrónico válido
-                  </mat-error>
-                </mat-form-field>
-                
-                <mat-form-field appearance="outline" class="w-100 mb-3">
-                  <mat-label>Contraseña</mat-label>
-                  <input matInput formControlName="password" [type]="hidePassword ? 'password' : 'text'">
-                  <button mat-icon-button matSuffix (click)="hidePassword = !hidePassword" type="button">
-                    <mat-icon>{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
-                  </button>
-                  <mat-error *ngIf="passwordNoValido">
-                    La contraseña debe tener al menos 6 caracteres
-                  </mat-error>
-                </mat-form-field>
-                
-                <mat-form-field appearance="outline" class="w-100 mb-3">
-                  <mat-label>Rol</mat-label>
-                  <mat-select formControlName="rol">
-                    <mat-option value="EMPLEADO">Empleado</mat-option>
-                  </mat-select>
-                </mat-form-field>
-                
-                <div class="d-flex justify-content-end">
-                  <button mat-raised-button color="primary" type="submit" [disabled]="cargando">
-                    <mat-spinner diameter="20" *ngIf="cargando" class="me-2"></mat-spinner>
-                    Guardar
-                  </button>
+
+                <div class="col-md-6">
+                  <mat-form-field appearance="outline" class="w-100 mb-3">
+                    <mat-label>{{ "ADMIN.LAST_NAME" | translate }}</mat-label>
+                    <input matInput formControlName="apellido" />
+                    <mat-error *ngIf="apellidoNoValido">
+                      {{ "ADMIN.LAST_NAME_ERROR" | translate }}
+                    </mat-error>
+                  </mat-form-field>
                 </div>
-              </form>
-            </div>
+              </div>
+
+              <mat-form-field appearance="outline" class="w-100 mb-3">
+                <mat-label>{{ "ADMIN.EMAIL" | translate }}</mat-label>
+                <input matInput formControlName="email" type="email" />
+                <mat-icon matSuffix>email</mat-icon>
+                <mat-error *ngIf="emailNoValido">
+                  {{ "ADMIN.EMAIL_ERROR" | translate }}
+                </mat-error>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="w-100 mb-3">
+                <mat-label>{{ "ADMIN.PASSWORD" | translate }}</mat-label>
+                <input
+                  matInput
+                  formControlName="password"
+                  [type]="hidePassword ? 'password' : 'text'"
+                />
+                <button
+                  mat-icon-button
+                  matSuffix
+                  (click)="hidePassword = !hidePassword"
+                  type="button"
+                >
+                  <mat-icon>{{
+                    hidePassword ? "visibility_off" : "visibility"
+                  }}</mat-icon>
+                </button>
+                <mat-error *ngIf="passwordNoValido">
+                  {{ "ADMIN.PASSWORD_ERROR" | translate }}
+                </mat-error>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="w-100 mb-3">
+                <mat-label>{{ "ADMIN.ROLE" | translate }}</mat-label>
+                <mat-select formControlName="rol">
+                  <mat-option value="EMPLEADO">{{
+                    "ADMIN.EMPLOYEE" | translate
+                  }}</mat-option>
+                </mat-select>
+              </mat-form-field>
+
+              <div class="d-flex justify-content-end">
+                <button
+                  mat-raised-button
+                  color="primary"
+                  type="submit"
+                  [disabled]="cargando"
+                >
+                  <mat-spinner
+                    diameter="20"
+                    *ngIf="cargando"
+                    class="me-2"
+                  ></mat-spinner>
+                  {{ "ADMIN.SAVE" | translate }}
+                </button>
+              </div>
+            </form>
+          </div>
           }
-          
+
           <!-- Tabla de usuarios -->
           @if (cargando && usuarios.length === 0) {
-            <div class="text-center my-4">
-              <mat-spinner diameter="40" class="mx-auto mb-2"></mat-spinner>
-              <p>Cargando usuarios...</p>
-            </div>
-          }
-          
-          @if (!cargando && usuarios.length === 0) {
-            <mat-card appearance="outlined" class="mb-3 bg-light">
-              <mat-card-content>
-                <p class="text-center my-2">No hay usuarios registrados en el sistema.</p>
-              </mat-card-content>
-            </mat-card>
-          }
-          
-          @if (usuarios.length > 0) {
-            <div class="mat-elevation-z2">
-              <table mat-table [dataSource]="usuarios" class="w-100">
-                <!-- ID Column -->
-                <ng-container matColumnDef="id">
-                  <th mat-header-cell *matHeaderCellDef> ID </th>
-                  <td mat-cell *matCellDef="let usuario"> {{usuario.id}} </td>
-                </ng-container>
-            
-                <!-- Nombre Column -->
-                <ng-container matColumnDef="nombre">
-                  <th mat-header-cell *matHeaderCellDef> Nombre </th>
-                  <td mat-cell *matCellDef="let usuario"> {{usuario.nombre}} </td>
-                </ng-container>
-            
-                <!-- Apellido Column -->
-                <ng-container matColumnDef="apellido">
-                  <th mat-header-cell *matHeaderCellDef> Apellido </th>
-                  <td mat-cell *matCellDef="let usuario"> {{usuario.apellido}} </td>
-                </ng-container>
-            
-                <!-- Email Column -->
-                <ng-container matColumnDef="email">
-                  <th mat-header-cell *matHeaderCellDef> Email </th>
-                  <td mat-cell *matCellDef="let usuario"> {{usuario.email}} </td>
-                </ng-container>
-            
-                <!-- Roles Column -->
-                <ng-container matColumnDef="roles">
-                  <th mat-header-cell *matHeaderCellDef> Rol </th>
-                  <td mat-cell *matCellDef="let usuario"> 
-                    <span *ngFor="let rol of usuario.roles">
-                      <mat-chip-option [selected]="true" [color]="rol.nombre === 'admin' ? 'primary' : 'accent'" disabled>
-                        {{rol.nombre}}
-                      </mat-chip-option>
-                    </span>
-                  </td>
-                </ng-container>
-            
-                <!-- Acciones Column -->
-                <ng-container matColumnDef="acciones">
-                  <th mat-header-cell *matHeaderCellDef> Acciones </th>
-                  <td mat-cell *matCellDef="let usuario">
-                    <button mat-icon-button [matMenuTriggerFor]="usuarioMenu">
-                      <mat-icon>more_vert</mat-icon>
+          <div class="text-center my-4">
+            <mat-spinner diameter="40" class="mx-auto mb-2"></mat-spinner>
+            <p>{{ "ADMIN.LOADING_USERS" | translate }}</p>
+          </div>
+          } @if (!cargando && usuarios.length === 0) {
+          <mat-card appearance="outlined" class="mb-3 bg-light">
+            <mat-card-content>
+              <p class="text-center my-2">{{ "ADMIN.NO_USERS" | translate }}</p>
+            </mat-card-content>
+          </mat-card>
+          } @if (usuarios.length > 0) {
+          <div class="mat-elevation-z2">
+            <table mat-table [dataSource]="usuarios" class="w-100">
+              <!-- ID Column -->
+              <ng-container matColumnDef="id">
+                <th mat-header-cell *matHeaderCellDef>
+                  {{ "ADMIN.TABLE_HEADERS.ID" | translate }}
+                </th>
+                <td mat-cell *matCellDef="let usuario">{{ usuario.id }}</td>
+              </ng-container>
+
+              <!-- Nombre Column -->
+              <ng-container matColumnDef="nombre">
+                <th mat-header-cell *matHeaderCellDef>
+                  {{ "ADMIN.TABLE_HEADERS.NAME" | translate }}
+                </th>
+                <td mat-cell *matCellDef="let usuario">{{ usuario.nombre }}</td>
+              </ng-container>
+
+              <!-- Apellido Column -->
+              <ng-container matColumnDef="apellido">
+                <th mat-header-cell *matHeaderCellDef>
+                  {{ "ADMIN.TABLE_HEADERS.LAST_NAME" | translate }}
+                </th>
+                <td mat-cell *matCellDef="let usuario">
+                  {{ usuario.apellido }}
+                </td>
+              </ng-container>
+
+              <!-- Email Column -->
+              <ng-container matColumnDef="email">
+                <th mat-header-cell *matHeaderCellDef>
+                  {{ "ADMIN.TABLE_HEADERS.EMAIL" | translate }}
+                </th>
+                <td mat-cell *matCellDef="let usuario">{{ usuario.email }}</td>
+              </ng-container>
+
+              <!-- Roles Column -->
+              <ng-container matColumnDef="roles">
+                <th mat-header-cell *matHeaderCellDef>
+                  {{ "ADMIN.TABLE_HEADERS.ROLE" | translate }}
+                </th>
+                <td mat-cell *matCellDef="let usuario">
+                  <span *ngFor="let rol of usuario.roles">
+                    <mat-chip-option
+                      [selected]="true"
+                      [color]="rol.nombre === 'admin' ? 'primary' : 'accent'"
+                      disabled
+                    >
+                      {{ "ADMIN." + rol.nombre | translate }}
+                    </mat-chip-option>
+                  </span>
+                </td>
+              </ng-container>
+
+              <!-- Acciones Column -->
+              <ng-container matColumnDef="acciones">
+                <th mat-header-cell *matHeaderCellDef>
+                  {{ "ADMIN.TABLE_HEADERS.ACTIONS" | translate }}
+                </th>
+                <td mat-cell *matCellDef="let usuario">
+                  <button mat-icon-button [matMenuTriggerFor]="usuarioMenu">
+                    <mat-icon>more_vert</mat-icon>
+                  </button>
+                  <mat-menu #usuarioMenu="matMenu">
+                    <button
+                      mat-menu-item
+                      (click)="eliminarUsuario(usuario.id!)"
+                      [disabled]="cargando || tieneRolAdmin(usuario)"
+                    >
+                      <mat-icon color="warn">delete</mat-icon>
+                      <span>{{ "ADMIN.DELETE" | translate }}</span>
                     </button>
-                    <mat-menu #usuarioMenu="matMenu">
-                      <button mat-menu-item (click)="eliminarUsuario(usuario.id!)" 
-                              [disabled]="cargando || tieneRolAdmin(usuario)">
-                        <mat-icon color="warn">delete</mat-icon>
-                        <span>Eliminar</span>
-                      </button>
-                      <button mat-menu-item (click)="abrirDialogRoles(usuario)"
-                              [disabled]="tieneRolAdmin(usuario)"
-                              [matTooltip]="tieneRolAdmin(usuario) ? 'No se puede cambiar los roles de un administrador' : 'Cambiar roles'">
-                        <mat-icon>admin_panel_settings</mat-icon>
-                        <span>Cambiar roles</span>
-                      </button>
-                    </mat-menu>
-                  </td>
-                </ng-container>
-            
-                <tr mat-header-row *matHeaderRowDef="['id', 'nombre', 'apellido', 'email', 'roles', 'acciones']"></tr>
-                <tr mat-row *matRowDef="let row; columns: ['id', 'nombre', 'apellido', 'email', 'roles', 'acciones']"></tr>
-              </table>
-            </div>
+                    <button
+                      mat-menu-item
+                      (click)="abrirDialogRoles(usuario)"
+                      [disabled]="tieneRolAdmin(usuario)"
+                      [matTooltip]="
+                        tieneRolAdmin(usuario)
+                          ? ('ADMIN.CANNOT_CHANGE_ADMIN_ROLES' | translate)
+                          : ('ADMIN.CHANGE_ROLES' | translate)
+                      "
+                    >
+                      <mat-icon>admin_panel_settings</mat-icon>
+                      <span>{{ "ADMIN.CHANGE_ROLES" | translate }}</span>
+                    </button>
+                  </mat-menu>
+                </td>
+              </ng-container>
+
+              <tr
+                mat-header-row
+                *matHeaderRowDef="[
+                  'id',
+                  'nombre',
+                  'apellido',
+                  'email',
+                  'roles',
+                  'acciones'
+                ]"
+              ></tr>
+              <tr
+                mat-row
+                *matRowDef="
+                  let row;
+                  columns: [
+                    'id',
+                    'nombre',
+                    'apellido',
+                    'email',
+                    'roles',
+                    'acciones'
+                  ]
+                "
+              ></tr>
+            </table>
+          </div>
           }
         </mat-card-content>
       </mat-card>

@@ -4,12 +4,14 @@ import { MatDialog } from '@angular/material/dialog';
 import { UsuariosService } from '../../services/usuarios.service';
 import { Usuario } from '../../models/usuario.model';
 import { CambiarRolesDialogComponent } from './cambiar-roles-dialog.component';
+import { TranslateService } from '@ngx-translate/core';
+import { LanguageService } from '../../services/language.service';
 
 @Component({
   selector: 'app-admin',
   standalone: false,
   templateUrl: './admin.component.html',
-  styleUrl: './admin.component.css'
+  styleUrl: './admin.component.css',
 })
 export class AdminComponent implements OnInit {
   usuarios: Usuario[] = [];
@@ -23,18 +25,24 @@ export class AdminComponent implements OnInit {
   constructor(
     private usuariosService: UsuariosService,
     private fb: FormBuilder,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private translate: TranslateService,
+    private languageService: LanguageService
   ) {
     this.formularioEmpleado = this.fb.group({
       nombre: ['', [Validators.required, Validators.minLength(3)]],
       apellido: ['', [Validators.required, Validators.minLength(3)]],
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]],
-      rol: ['EMPLEADO', Validators.required]
+      rol: ['EMPLEADO', Validators.required],
     });
   }
 
   ngOnInit(): void {
+    this.translate.get('ADMIN.TITLE').subscribe((res: string) => {
+      console.log('Traducción cargada:', res);
+    });
+
     this.cargarUsuarios();
   }
 
@@ -49,7 +57,7 @@ export class AdminComponent implements OnInit {
         console.error('Error al cargar usuarios:', error);
         this.mostrarAlerta('Error al cargar la lista de usuarios', 'danger');
         this.cargando = false;
-      }
+      },
     });
   }
 
@@ -57,14 +65,14 @@ export class AdminComponent implements OnInit {
     this.mostrarFormulario = !this.mostrarFormulario;
     if (this.mostrarFormulario === false) {
       this.formularioEmpleado.reset({
-        rol: 'EMPLEADO'
+        rol: 'EMPLEADO',
       });
     }
   }
 
   crearEmpleado(): void {
     if (this.formularioEmpleado.invalid) {
-      Object.values(this.formularioEmpleado.controls).forEach(control => {
+      Object.values(this.formularioEmpleado.controls).forEach((control) => {
         control.markAsTouched();
       });
       return;
@@ -72,12 +80,12 @@ export class AdminComponent implements OnInit {
 
     this.cargando = true;
     const nuevoEmpleado = this.formularioEmpleado.value;
-    
+
     this.usuariosService.crearEmpleado(nuevoEmpleado).subscribe({
       next: () => {
         this.mostrarAlerta('Empleado creado exitosamente', 'success');
         this.formularioEmpleado.reset({
-          rol: 'EMPLEADO'
+          rol: 'EMPLEADO',
         });
         this.cargarUsuarios();
         this.toggleFormulario();
@@ -85,16 +93,22 @@ export class AdminComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error al crear empleado:', error);
-        this.mostrarAlerta(error.error?.detail || 'Error al crear el empleado', 'danger');
+        this.mostrarAlerta(
+          error.error?.detail || 'Error al crear el empleado',
+          'danger'
+        );
         this.cargando = false;
-      }
+      },
     });
   }
 
   eliminarUsuario(id: number): void {
-    const usuario = this.usuarios.find(u => u.id === id);
+    const usuario = this.usuarios.find((u) => u.id === id);
     if (usuario && this.tieneRolAdmin(usuario)) {
-      this.mostrarAlerta('No se puede eliminar un usuario administrador', 'danger');
+      this.mostrarAlerta(
+        'No se puede eliminar un usuario administrador',
+        'danger'
+      );
       return;
     }
 
@@ -109,23 +123,26 @@ export class AdminComponent implements OnInit {
           console.error('Error al eliminar usuario:', error);
           this.mostrarAlerta('Error al eliminar el usuario', 'danger');
           this.cargando = false;
-        }
+        },
       });
     }
   }
 
   abrirDialogRoles(usuario: Usuario): void {
     if (this.tieneRolAdmin(usuario)) {
-      this.mostrarAlerta('No se puede cambiar los roles de un administrador', 'danger');
+      this.mostrarAlerta(
+        'No se puede cambiar los roles de un administrador',
+        'danger'
+      );
       return;
     }
-    
+
     const dialogRef = this.dialog.open(CambiarRolesDialogComponent, {
       width: '500px',
-      data: { usuario }
+      data: { usuario },
     });
 
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe((result) => {
       if (result) {
         this.cargarUsuarios();
         this.mostrarAlerta('Roles actualizados correctamente', 'success');
@@ -137,7 +154,7 @@ export class AdminComponent implements OnInit {
     if (!usuario || !usuario.roles || usuario.roles.length === 0) {
       return false;
     }
-    return usuario.roles.some(rol => rol.nombre === 'admin');
+    return usuario.roles.some((rol) => rol.nombre === 'admin');
   }
 
   mostrarAlerta(mensaje: string, tipo: string): void {
@@ -166,7 +183,10 @@ export class AdminComponent implements OnInit {
   }
 
   formularioInvalido(campo: string): boolean {
-    return this.formularioEmpleado.get(campo)?.invalid && 
-           this.formularioEmpleado.get(campo)?.touched || false;
+    return (
+      (this.formularioEmpleado.get(campo)?.invalid &&
+        this.formularioEmpleado.get(campo)?.touched) ||
+      false
+    );
   }
 }

@@ -1,45 +1,106 @@
-import { Component } from '@angular/core';
-import { ReservasService } from '../../services/reservas.service';
+import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { TranslateService } from '@ngx-translate/core';
+import {
+  ReservaService,
+  Room,
+  Reservation,
+} from '../../services/reserva.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatDialog } from '@angular/material/dialog';
 import { PagosComponent } from '../pagos/pagos.component';
 import { AuthService } from '../../services/auth.service';
 import { TicketComponent } from '../ticket/ticket.component';
+import { LanguageService } from '../../services/language.service';
 
 @Component({
   selector: 'app-reservas',
   standalone: false,
   templateUrl: './reservas.component.html',
-  styleUrl: './reservas.component.css'
+  styleUrl: './reservas.component.css',
 })
-export class ReservasComponent {
+export class ReservasComponent implements OnInit {
+  searchForm: FormGroup;
+  availableRooms: Room[] = [];
+  loading = false;
+  searchPerformed = false;
   fechaLlegada: string = '';
   fechaSalida: string = '';
   numHuespedes: number = 1;
-  habitacionesDisponibles: any[] = [];
+  habitacionesDisponibles: Room[] = [];
   buscando: boolean = false;
   error: string = '';
   minFechaLlegada: Date = new Date(Date.now() + 24 * 60 * 60 * 1000); // Mañana
   minFechaSalida: Date = this.getMinFechaSalida();
-  misReservas: any[] = [];
+  misReservas: Reservation[] = [];
   viendoMisReservas: boolean = false;
 
-  constructor(private reservasService: ReservasService, private dialog: MatDialog, private authService: AuthService) {}
+  constructor(
+    private fb: FormBuilder,
+    private translate: TranslateService,
+    private reservaService: ReservaService,
+    private snackBar: MatSnackBar,
+    private dialog: MatDialog,
+    private authService: AuthService,
+    private languageService: LanguageService
+  ) {
+    this.searchForm = this.fb.group({
+      arrivalDate: ['', Validators.required],
+      departureDate: ['', Validators.required],
+      guests: [1, [Validators.required, Validators.min(1)]],
+    });
+  }
 
-  abrirPago(habitacion: any) {
+  ngOnInit(): void {}
+
+  onSearch(): void {
+    if (this.searchForm.valid) {
+      this.loading = true;
+      this.searchPerformed = true;
+      const formData = this.searchForm.value;
+
+      this.reservaService
+        .consultarDisponibilidad(
+          formData.arrivalDate,
+          formData.departureDate,
+          formData.guests
+        )
+        .subscribe({
+          next: (response: Room[]) => {
+            this.availableRooms = response;
+            this.loading = false;
+          },
+          error: (error: any) => {
+            console.error('Error al buscar disponibilidad:', error);
+            this.snackBar.open(
+              this.translate.instant('RESERVATION.ERROR'),
+              this.translate.instant('COMMON.CLOSE'),
+              { duration: 3000 }
+            );
+            this.loading = false;
+          },
+        });
+    }
+  }
+
+  selectRoom(room: Room): void {
     const dialogRef = this.dialog.open(PagosComponent, {
-      width: '420px',
+      width: '500px',
       data: {
-        habitacion,
-        fecha_inicio: this.fechaLlegada,
-        fecha_fin: this.fechaSalida,
-        numHuespedes: this.numHuespedes
-      }
+        room,
+        arrivalDate: this.searchForm.get('arrivalDate')?.value,
+        departureDate: this.searchForm.get('departureDate')?.value,
+        guests: this.searchForm.get('guests')?.value,
+      },
     });
 
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe((result) => {
       if (result) {
-        // Si el pago fue exitoso, recarga la disponibilidad
-        this.buscarDisponibilidad();
+        this.snackBar.open(
+          this.translate.instant('RESERVATION.CONFIRMED'),
+          this.translate.instant('COMMON.CLOSE'),
+          { duration: 3000 }
+        );
       }
     });
   }
@@ -56,7 +117,10 @@ export class ReservasComponent {
     this.fechaLlegada = fecha;
     this.minFechaSalida = this.getMinFechaSalida();
     // Si la fecha de salida es anterior o igual, la resetea
-    if (this.fechaSalida && new Date(this.fechaSalida) <= new Date(this.fechaLlegada)) {
+    if (
+      this.fechaSalida &&
+      new Date(this.fechaSalida) <= new Date(this.fechaLlegada)
+    ) {
       this.fechaSalida = '';
     }
   }
@@ -68,12 +132,12 @@ export class ReservasComponent {
 
     // Validación extra en frontend
     if (!this.fechaLlegada || !this.fechaSalida) {
-      this.error = 'Debes seleccionar ambas fechas.';
+      this.error = this.translate.instant('RESERVATION.ERROR');
       this.buscando = false;
       return;
     }
     if (new Date(this.fechaSalida) <= new Date(this.fechaLlegada)) {
-      this.error = 'La fecha de salida debe ser posterior a la fecha de llegada';
+      this.error = this.translate.instant('RESERVATION.ERROR');
       this.buscando = false;
       return;
     }
@@ -81,16 +145,21 @@ export class ReservasComponent {
     const fechaLlegadaStr = this.formatearFecha(this.fechaLlegada);
     const fechaSalidaStr = this.formatearFecha(this.fechaSalida);
 
-    this.reservasService.consultarDisponibilidad(fechaLlegadaStr, fechaSalidaStr, this.numHuespedes)
+    this.reservaService
+      .consultarDisponibilidad(
+        fechaLlegadaStr,
+        fechaSalidaStr,
+        this.numHuespedes
+      )
       .subscribe({
-        next: (data) => {
+        next: (data: Room[]) => {
           this.habitacionesDisponibles = data;
           this.buscando = false;
         },
-        error: (err) => {
-          this.error = 'Error al consultar disponibilidad';
+        error: (err: any) => {
+          this.error = this.translate.instant('RESERVATION.ERROR');
           this.buscando = false;
-        }
+        },
       });
   }
 
@@ -121,28 +190,52 @@ export class ReservasComponent {
     }
   }
 
-  verMisReservas() {
+  verMisReservas(): void {
     this.viendoMisReservas = true;
+    this.availableRooms = [];
     this.misReservas = [];
-    this.habitacionesDisponibles = []; // Limpiar las habitaciones disponibles
-    this.reservasService.obtenerMisReservas().subscribe({
-      next: (data) => {
+    this.reservaService.obtenerMisReservas().subscribe({
+      next: (data: Reservation[]) => {
         this.misReservas = data || [];
       },
-      error: () => {
-        this.misReservas = [];
-      }
+      error: (error: any) => {
+        console.error('Error al obtener reservas:', error);
+        this.snackBar.open(
+          this.translate.instant('RESERVATION.ERROR'),
+          this.translate.instant('COMMON.CLOSE'),
+          { duration: 3000 }
+        );
+      },
     });
   }
 
-  volverABuscar() {
+  volverABuscar(): void {
     this.viendoMisReservas = false;
+    this.misReservas = [];
   }
 
-  verTicket(reserva: any) {
+  verTicket(reserva: Reservation) {
     this.dialog.open(TicketComponent, {
       width: '400px',
-      data: reserva
+      data: reserva,
+    });
+  }
+
+  abrirPago(habitacion: Room) {
+    const dialogRef = this.dialog.open(PagosComponent, {
+      width: '420px',
+      data: {
+        habitacion,
+        fecha_inicio: this.fechaLlegada,
+        fecha_fin: this.fechaSalida,
+        numHuespedes: this.numHuespedes,
+      },
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result) {
+        this.buscarDisponibilidad();
+      }
     });
   }
 }

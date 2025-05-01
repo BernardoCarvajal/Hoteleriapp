@@ -2,44 +2,72 @@
 <div class="login-container">
   <mat-card>
     <mat-card-header>
-      <mat-card-title>Bienvenido a Hoteleriapp</mat-card-title>
+      <mat-card-title
+        >{{ "COMMON.WELCOME" | translate }}
+        {{ "COMMON.TO" | translate }} Hoteleriapp</mat-card-title
+      >
     </mat-card-header>
 
     <mat-card-content>
       <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
         <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Correo electrónico</mat-label>
-          <input matInput formControlName="email" type="email" placeholder="ejemplo@correo.com">
+          <mat-label>{{ "AUTH.EMAIL" | translate }}</mat-label>
+          <input
+            matInput
+            formControlName="email"
+            type="email"
+            [placeholder]="'AUTH.EMAIL_PLACEHOLDER' | translate"
+          />
           <mat-icon matPrefix>email</mat-icon>
           <mat-error *ngIf="loginForm.get('email')?.hasError('required')">
-            El correo es requerido
+            {{ "AUTH.EMAIL_REQUIRED" | translate }}
           </mat-error>
           <mat-error *ngIf="loginForm.get('email')?.hasError('email')">
-            Ingrese un correo válido
+            {{ "AUTH.EMAIL_INVALID" | translate }}
           </mat-error>
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Contraseña</mat-label>
-          <input matInput formControlName="password" [type]="hide ? 'password' : 'text'" placeholder="••••••••">
+          <mat-label>{{ "AUTH.PASSWORD" | translate }}</mat-label>
+          <input
+            matInput
+            formControlName="password"
+            [type]="hide ? 'password' : 'text'"
+            placeholder="••••••••"
+          />
           <mat-icon matPrefix>lock</mat-icon>
-          <button mat-icon-button matSuffix (click)="hide = !hide" type="button">
-            <mat-icon>{{hide ? 'visibility_off' : 'visibility'}}</mat-icon>
+          <button
+            mat-icon-button
+            matSuffix
+            (click)="hide = !hide"
+            type="button"
+          >
+            <mat-icon>{{ hide ? "visibility_off" : "visibility" }}</mat-icon>
           </button>
           <mat-error *ngIf="loginForm.get('password')?.hasError('required')">
-            La contraseña es requerida
+            {{ "AUTH.PASSWORD_REQUIRED" | translate }}
           </mat-error>
           <mat-error *ngIf="loginForm.get('password')?.hasError('minlength')">
-            La contraseña debe tener al menos 6 caracteres
+            {{ "AUTH.PASSWORD_MIN_LENGTH" | translate }}
           </mat-error>
         </mat-form-field>
 
         <div class="button-container">
-          <button mat-raised-button color="primary" type="submit" [disabled]="!loginForm.valid">
-            Iniciar Sesión
+          <button
+            mat-raised-button
+            color="primary"
+            type="submit"
+            [disabled]="!loginForm.valid"
+          >
+            {{ "AUTH.SIGN_IN" | translate }}
           </button>
-          <button mat-stroked-button color="accent" type="button" routerLink="/register">
-            Registrarse
+          <button
+            mat-stroked-button
+            color="accent"
+            type="button"
+            routerLink="/register"
+          >
+            {{ "AUTH.SIGN_UP" | translate }}
           </button>
         </div>
       </form>
