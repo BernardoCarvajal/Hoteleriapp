@@ -19,13 +19,10 @@ export class LanguageService {
       // Usar el idioma guardado en localStorage
       this.translate.use(savedLang);
     } else {
-      // Intentar usar el idioma del navegador
-      const browserLang = this.translate.getBrowserLang();
-      const lang =
-        browserLang && ['es', 'en'].includes(browserLang) ? browserLang : 'es';
-      this.translate.use(lang);
+      // Establecer español como idioma predeterminado (ignorando el idioma del navegador)
+      this.translate.use('es');
       // Guardar la preferencia
-      localStorage.setItem('preferredLanguage', lang);
+      localStorage.setItem('preferredLanguage', 'es');
     }
   }
 
