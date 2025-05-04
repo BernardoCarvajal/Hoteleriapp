@@ -151,8 +151,25 @@ export class ReservaService {
 
   obtenerMisReservas(): Observable<Reservation[]> {
     return this.http
-      .get<Reservation[]>(`${this.apiUrlDirecto}/usuarios/mis-reservas`)
+      .get<any[]>(`${this.apiUrlDirecto}/usuarios/mis-reservas`)
       .pipe(
+        map((reservas) =>
+          reservas.map((r) => ({
+            id: r.id,
+            code: r.codigo_reserva,
+            status: r.estado,
+            startDate: r.fecha_inicio,
+            endDate: r.fecha_fin,
+            nights: r.noches,
+            guests: r.numero_huespedes,
+            rooms: r.habitaciones || [],
+            subtotal: r.subtotal,
+            taxes: r.impuestos,
+            total: r.total,
+            paid: r.pagado,
+            pending: r.pendiente,
+          }))
+        ),
         catchError((error) => {
           console.error('Error al obtener mis reservas', error);
           return of([]);
