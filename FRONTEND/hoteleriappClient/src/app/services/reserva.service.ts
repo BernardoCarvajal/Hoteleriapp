@@ -7,9 +7,14 @@ import { environment } from '../../environments/environment';
 
 export interface Room {
   id: number;
-  type: string;
-  price: number;
-  capacity: number;
+  numero: string;
+  tipo: string;
+  capacidad: number;
+  precio_por_noche: number;
+  descripcion?: string;
+  type?: string;
+  price?: number;
+  capacity?: number;
   description?: string;
 }
 
@@ -114,7 +119,7 @@ export class ReservaService {
     numHuespedes: number
   ): Observable<Room[]> {
     return this.http
-      .get<Room[]>(`${this.apiUrl}/disponibilidad`, {
+      .get<any[]>(`${this.apiUrl}/disponibilidad`, {
         params: {
           fecha_llegada: fechaInicio,
           fecha_salida: fechaFin,
@@ -122,6 +127,20 @@ export class ReservaService {
         },
       })
       .pipe(
+        map((habitaciones) =>
+          habitaciones.map((hab) => ({
+            id: hab.id,
+            numero: hab.numero,
+            tipo: hab.tipo,
+            capacidad: hab.capacidad,
+            precio_por_noche: hab.precio_por_noche,
+            descripcion: hab.descripcion,
+            type: hab.tipo,
+            price: hab.precio_por_noche,
+            capacity: hab.capacidad,
+            description: hab.descripcion,
+          }))
+        ),
         catchError((error) => {
           console.error('Error al consultar disponibilidad', error);
           return of([]);
