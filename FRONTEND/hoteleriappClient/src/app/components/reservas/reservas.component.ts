@@ -175,7 +175,11 @@ export class ReservasComponent implements OnInit {
     return `${d.getFullYear()}-${month}-${day}`;
   }
 
-  getImagenHabitacion(tipo: string): string {
+  getImagenHabitacion(tipo: string | undefined | null): string {
+    if (!tipo) {
+      return 'https://images.unsplash.com/photo-1503676382389-4809596d5290?auto=format&fit=crop&w=400&q=80'; // Imagen por defecto
+    }
+
     switch (tipo.toLowerCase()) {
       case 'individual':
         return 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=400&q=80'; // Individual
