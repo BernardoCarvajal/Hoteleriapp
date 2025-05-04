@@ -102,7 +102,7 @@
             <img
               mat-card-image
               [src]="getImagenHabitacion(hab.tipo ?? '')"
-              [alt]="'ROOM.' + (hab.tipo ?? '') | translate"
+              [alt]="getTipoHabitacionTraducido(hab.tipo)"
             />
             <mat-card-header>
               <mat-icon mat-card-avatar color="primary">hotel</mat-icon>

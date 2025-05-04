@@ -194,6 +194,23 @@ export class ReservasComponent implements OnInit {
     }
   }
 
+  getTipoHabitacionTraducido(tipo: string | undefined | null): string {
+    if (!tipo) return '';
+
+    switch (tipo.toLowerCase()) {
+      case 'individual':
+        return this.translate.instant('ROOM.INDIVIDUAL');
+      case 'doble':
+        return this.translate.instant('ROOM.DOBLE');
+      case 'familiar':
+        return this.translate.instant('ROOM.FAMILIAR');
+      case 'suite':
+        return this.translate.instant('ROOM.SUITE');
+      default:
+        return tipo; // Devuelve el tipo original si no hay traducción
+    }
+  }
+
   verMisReservas(): void {
     this.viendoMisReservas = true;
     this.availableRooms = [];
