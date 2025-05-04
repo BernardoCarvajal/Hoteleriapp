@@ -116,9 +116,9 @@ export class ReservaService {
     return this.http
       .get<Room[]>(`${this.apiUrl}/disponibilidad`, {
         params: {
-          fechaInicio,
-          fechaFin,
-          numHuespedes: numHuespedes.toString(),
+          fecha_llegada: fechaInicio,
+          fecha_salida: fechaFin,
+          num_huespedes: numHuespedes.toString(),
         },
       })
       .pipe(
