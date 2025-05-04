@@ -38,6 +38,7 @@ export interface Reservation {
   providedIn: 'root',
 })
 export class ReservaService {
+  private apiUrlDirecto = `${environment.apiUrl}`;
   private apiUrl = `${environment.apiUrl}/reservas`;
 
   constructor(private http: HttpClient) {}
@@ -149,11 +150,13 @@ export class ReservaService {
   }
 
   obtenerMisReservas(): Observable<Reservation[]> {
-    return this.http.get<Reservation[]>(`${this.apiUrl}/mis-reservas`).pipe(
-      catchError((error) => {
-        console.error('Error al obtener mis reservas', error);
-        return of([]);
-      })
-    );
+    return this.http
+      .get<Reservation[]>(`${this.apiUrlDirecto}/usuarios/mis-reservas`)
+      .pipe(
+        catchError((error) => {
+          console.error('Error al obtener mis reservas', error);
+          return of([]);
+        })
+      );
   }
 }
