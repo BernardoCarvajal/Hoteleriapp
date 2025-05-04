@@ -101,28 +101,30 @@
           >
             <img
               mat-card-image
-              [src]="getImagenHabitacion(hab.type)"
-              [alt]="'ROOM.' + hab.type | translate"
+              [src]="getImagenHabitacion(hab.tipo ?? '')"
+              [alt]="'ROOM.' + (hab.tipo ?? '') | translate"
             />
             <mat-card-header>
               <mat-icon mat-card-avatar color="primary">hotel</mat-icon>
               <mat-card-title>{{
-                "ROOM." + hab.type | translate
+                "ROOM." + (hab.tipo ?? "") | translate
               }}</mat-card-title>
-              <mat-card-subtitle>{{ hab.type }}</mat-card-subtitle>
+              <mat-card-subtitle>{{ hab.tipo }}</mat-card-subtitle>
             </mat-card-header>
             <mat-card-content>
               <p>
                 <strong>{{ "RESERVATION.GUESTS" | translate }}:</strong>
-                {{ hab.capacity }}
+                {{ hab.capacidad }}
               </p>
-              <p *ngIf="hab.price">
+              <p *ngIf="hab.precio_por_noche">
                 <strong>{{ "RESERVATION.PRICE" | translate }}:</strong>
-                {{ hab.price | currency : "USD" : "symbol" : "1.2-2" }}
+                {{
+                  hab.precio_por_noche | currency : "USD" : "symbol" : "1.2-2"
+                }}
               </p>
-              <p *ngIf="hab.description">
+              <p *ngIf="hab.descripcion">
                 <strong>{{ "COMMON.DESCRIPTION" | translate }}:</strong>
-                {{ hab.description }}
+                {{ hab.descripcion }}
               </p>
             </mat-card-content>
             <mat-card-actions>
