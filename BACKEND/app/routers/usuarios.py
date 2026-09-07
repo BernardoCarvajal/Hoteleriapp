@@ -3,7 +3,8 @@ from typing import List, Optional, Dict, Any
 from sqlalchemy.orm import Session
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime, timedelta
-from jose import jwt, JWTError
+import jwt
+from jwt.exceptions import InvalidTokenError
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from pydantic import BaseModel
 
@@ -54,7 +55,6 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Security(
     
     try:
         token = credentials.credentials
-        print(f"Token recibido: {token[:20]}...")
         
         try:
             payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
@@ -63,7 +63,7 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Security(
                 raise credentials_exception
             
             print(f"ID de usuario extraído del token: {user_id}")
-        except JWTError as e:
+        except InvalidTokenError as e:
             print(f"Error al decodificar token: {str(e)}")
             raise credentials_exception
         
@@ -205,8 +205,6 @@ async def login_usuario(
         expires_delta=access_token_expires
     )
     
-    # Mostrar información del token generado
-    print(f"Token generado: {access_token[:20]}...")
     
     return {"access_token": access_token, "token_type": "bearer"}
 
@@ -218,6 +216,7 @@ async def login_usuario(
 )
 async def registro_empleado(
     usuario: UserCreate,
+    current_user: UserORM = Security(get_admin_user),
     db: Session = Depends(get_db)
 ):
     """
@@ -268,6 +267,7 @@ async def registro_empleado(
 )
 async def registro_administrador(
     usuario: UserCreate,
+    current_user: UserORM = Security(get_admin_user),
     db: Session = Depends(get_db)
 ):
     """
@@ -318,6 +318,7 @@ async def registro_administrador(
 async def asignar_roles(
     usuario_id: int,
     roles_ids: List[int],
+    current_user: UserORM = Security(get_admin_user),
     db: Session = Depends(get_db)
 ):
     """

@@ -14,161 +14,180 @@
             matInput
             formControlName="nombre"
             [placeholder]="'AUTH.FIRST_NAME' | translate"
-          />
-          <mat-icon matPrefix>person</mat-icon>
-          <mat-error *ngIf="registroForm.get('nombre')?.hasError('required')">
-            {{ "AUTH.FIRST_NAME_REQUIRED" | translate }}
-          </mat-error>
-          <mat-error *ngIf="registroForm.get('nombre')?.hasError('minlength')">
-            {{ "AUTH.FIRST_NAME_MIN_LENGTH" | translate }}
-          </mat-error>
-        </mat-form-field>
+            />
+            <mat-icon matPrefix>person</mat-icon>
+            @if (registroForm.get('nombre')?.hasError('required')) {
+              <mat-error>
+                {{ "AUTH.FIRST_NAME_REQUIRED" | translate }}
+              </mat-error>
+            }
+            @if (registroForm.get('nombre')?.hasError('minlength')) {
+              <mat-error>
+                {{ "AUTH.FIRST_NAME_MIN_LENGTH" | translate }}
+              </mat-error>
+            }
+          </mat-form-field>
 
-        <!-- Apellido -->
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>{{ "AUTH.LAST_NAME" | translate }}</mat-label>
-          <input
-            matInput
-            formControlName="apellido"
-            [placeholder]="'AUTH.LAST_NAME' | translate"
-          />
-          <mat-icon matPrefix>person_outline</mat-icon>
-          <mat-error *ngIf="registroForm.get('apellido')?.hasError('required')">
-            {{ "AUTH.LAST_NAME_REQUIRED" | translate }}
-          </mat-error>
-          <mat-error
-            *ngIf="registroForm.get('apellido')?.hasError('minlength')"
-          >
-            {{ "AUTH.LAST_NAME_MIN_LENGTH" | translate }}
-          </mat-error>
-        </mat-form-field>
+          <!-- Apellido -->
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>{{ "AUTH.LAST_NAME" | translate }}</mat-label>
+            <input
+              matInput
+              formControlName="apellido"
+              [placeholder]="'AUTH.LAST_NAME' | translate"
+              />
+              <mat-icon matPrefix>person_outline</mat-icon>
+              @if (registroForm.get('apellido')?.hasError('required')) {
+                <mat-error>
+                  {{ "AUTH.LAST_NAME_REQUIRED" | translate }}
+                </mat-error>
+              }
+              @if (registroForm.get('apellido')?.hasError('minlength')) {
+                <mat-error
+                  >
+                  {{ "AUTH.LAST_NAME_MIN_LENGTH" | translate }}
+                </mat-error>
+              }
+            </mat-form-field>
 
-        <!-- Email -->
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>{{ "AUTH.EMAIL" | translate }}</mat-label>
-          <input
-            matInput
-            formControlName="email"
-            type="email"
-            [placeholder]="'AUTH.EMAIL_PLACEHOLDER' | translate"
-          />
-          <mat-icon matPrefix>email</mat-icon>
-          <mat-error *ngIf="registroForm.get('email')?.hasError('required')">
-            {{ "AUTH.EMAIL_REQUIRED" | translate }}
-          </mat-error>
-          <mat-error *ngIf="registroForm.get('email')?.hasError('email')">
-            {{ "AUTH.EMAIL_INVALID" | translate }}
-          </mat-error>
-        </mat-form-field>
+            <!-- Email -->
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>{{ "AUTH.EMAIL" | translate }}</mat-label>
+              <input
+                matInput
+                formControlName="email"
+                type="email"
+                [placeholder]="'AUTH.EMAIL_PLACEHOLDER' | translate"
+                />
+                <mat-icon matPrefix>email</mat-icon>
+                @if (registroForm.get('email')?.hasError('required')) {
+                  <mat-error>
+                    {{ "AUTH.EMAIL_REQUIRED" | translate }}
+                  </mat-error>
+                }
+                @if (registroForm.get('email')?.hasError('email')) {
+                  <mat-error>
+                    {{ "AUTH.EMAIL_INVALID" | translate }}
+                  </mat-error>
+                }
+              </mat-form-field>
 
-        <!-- Teléfono -->
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>{{ "AUTH.PHONE" | translate }}</mat-label>
-          <input
-            matInput
-            formControlName="telefono"
-            [placeholder]="'AUTH.PHONE' | translate"
-          />
-          <mat-icon matPrefix>phone</mat-icon>
-          <mat-error *ngIf="registroForm.get('telefono')?.hasError('required')">
-            {{ "AUTH.PHONE_REQUIRED" | translate }}
-          </mat-error>
-          <mat-error *ngIf="registroForm.get('telefono')?.hasError('pattern')">
-            {{ "AUTH.PHONE_INVALID" | translate }}
-          </mat-error>
-        </mat-form-field>
+              <!-- Teléfono -->
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>{{ "AUTH.PHONE" | translate }}</mat-label>
+                <input
+                  matInput
+                  formControlName="telefono"
+                  [placeholder]="'AUTH.PHONE' | translate"
+                  />
+                  <mat-icon matPrefix>phone</mat-icon>
+                  @if (registroForm.get('telefono')?.hasError('required')) {
+                    <mat-error>
+                      {{ "AUTH.PHONE_REQUIRED" | translate }}
+                    </mat-error>
+                  }
+                  @if (registroForm.get('telefono')?.hasError('pattern')) {
+                    <mat-error>
+                      {{ "AUTH.PHONE_INVALID" | translate }}
+                    </mat-error>
+                  }
+                </mat-form-field>
 
-        <!-- Documento de Identidad -->
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>{{ "AUTH.ID_DOCUMENT" | translate }}</mat-label>
-          <input
-            matInput
-            formControlName="documento_identidad"
-            [placeholder]="'AUTH.ID_DOCUMENT' | translate"
-          />
-          <mat-icon matPrefix>badge</mat-icon>
-          <mat-error
-            *ngIf="
-              registroForm.get('documento_identidad')?.hasError('required')
-            "
-          >
-            {{ "AUTH.ID_DOCUMENT_REQUIRED" | translate }}
-          </mat-error>
-        </mat-form-field>
+                <!-- Documento de Identidad -->
+                <mat-form-field appearance="outline" class="full-width">
+                  <mat-label>{{ "AUTH.ID_DOCUMENT" | translate }}</mat-label>
+                  <input
+                    matInput
+                    formControlName="documento_identidad"
+                    [placeholder]="'AUTH.ID_DOCUMENT' | translate"
+                    />
+                    <mat-icon matPrefix>badge</mat-icon>
+                    @if (
+                      registroForm.get('documento_identidad')?.hasError('required')
+                      ) {
+                      <mat-error
+                        >
+                        {{ "AUTH.ID_DOCUMENT_REQUIRED" | translate }}
+                      </mat-error>
+                    }
+                  </mat-form-field>
 
-        <!-- Contraseña -->
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>{{ "AUTH.PASSWORD" | translate }}</mat-label>
-          <input
-            matInput
-            formControlName="password"
-            [type]="hidePassword ? 'password' : 'text'"
-            [placeholder]="'AUTH.PASSWORD_PLACEHOLDER' | translate"
-          />
-          <button
-            mat-icon-button
-            matSuffix
-            (click)="hidePassword = !hidePassword"
-            type="button"
-          >
-            <mat-icon>{{
-              hidePassword ? "visibility_off" : "visibility"
-            }}</mat-icon>
-          </button>
-          <mat-error
-            *ngIf="
-              registroForm.get('password')?.touched &&
-              registroForm.get('password')?.invalid
-            "
-          >
-            {{ getErrorMessage("password") }}
-          </mat-error>
-          <mat-hint>{{ "AUTH.PASSWORD_HINT" | translate }}</mat-hint>
-        </mat-form-field>
+                  <!-- Contraseña -->
+                  <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>{{ "AUTH.PASSWORD" | translate }}</mat-label>
+                    <input
+                      matInput
+                      formControlName="password"
+                      [type]="hidePassword ? 'password' : 'text'"
+                      [placeholder]="'AUTH.PASSWORD_PLACEHOLDER' | translate"
+                      />
+                      <button
+                        mat-icon-button
+                        matSuffix
+                        (click)="hidePassword = !hidePassword"
+                        type="button"
+                        >
+                        <mat-icon>{{
+                          hidePassword ? "visibility_off" : "visibility"
+                        }}</mat-icon>
+                      </button>
+                      @if (
+                        registroForm.get('password')?.touched &&
+                        registroForm.get('password')?.invalid
+                        ) {
+                        <mat-error
+                          >
+                          {{ getErrorMessage("password") }}
+                        </mat-error>
+                      }
+                      <mat-hint>{{ "AUTH.PASSWORD_HINT" | translate }}</mat-hint>
+                    </mat-form-field>
 
-        <!-- Confirmar Contraseña -->
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>{{ "AUTH.CONFIRM_PASSWORD" | translate }}</mat-label>
-          <input
-            matInput
-            formControlName="confirmPassword"
-            [type]="hideConfirmPassword ? 'password' : 'text'"
-            [placeholder]="'AUTH.CONFIRM_PASSWORD_PLACEHOLDER' | translate"
-          />
-          <button
-            mat-icon-button
-            matSuffix
-            (click)="hideConfirmPassword = !hideConfirmPassword"
-            type="button"
-          >
-            <mat-icon>{{
-              hideConfirmPassword ? "visibility_off" : "visibility"
-            }}</mat-icon>
-          </button>
-          <mat-error *ngIf="getPasswordMismatchError()">
-            {{ "AUTH.PASSWORD_MISMATCH" | translate }}
-          </mat-error>
-        </mat-form-field>
+                    <!-- Confirmar Contraseña -->
+                    <mat-form-field appearance="outline" class="full-width">
+                      <mat-label>{{ "AUTH.CONFIRM_PASSWORD" | translate }}</mat-label>
+                      <input
+                        matInput
+                        formControlName="confirmPassword"
+                        [type]="hideConfirmPassword ? 'password' : 'text'"
+                        [placeholder]="'AUTH.CONFIRM_PASSWORD_PLACEHOLDER' | translate"
+                        />
+                        <button
+                          mat-icon-button
+                          matSuffix
+                          (click)="hideConfirmPassword = !hideConfirmPassword"
+                          type="button"
+                          >
+                          <mat-icon>{{
+                            hideConfirmPassword ? "visibility_off" : "visibility"
+                          }}</mat-icon>
+                        </button>
+                        @if (getPasswordMismatchError()) {
+                          <mat-error>
+                            {{ "AUTH.PASSWORD_MISMATCH" | translate }}
+                          </mat-error>
+                        }
+                      </mat-form-field>
 
-        <div class="button-container">
-          <button
-            mat-raised-button
-            color="primary"
-            type="submit"
-            [disabled]="!registroForm.valid"
-          >
-            {{ "AUTH.SIGN_UP" | translate }}
-          </button>
-          <button
-            mat-stroked-button
-            color="accent"
-            type="button"
-            routerLink="/login"
-          >
-            {{ "COMMON.CANCEL" | translate }}
-          </button>
-        </div>
-      </form>
-    </mat-card-content>
-  </mat-card>
-</div>
+                      <div class="button-container">
+                        <button
+                          mat-raised-button
+                          color="primary"
+                          type="submit"
+                          [disabled]="!registroForm.valid"
+                          >
+                          {{ "AUTH.SIGN_UP" | translate }}
+                        </button>
+                        <button
+                          mat-stroked-button
+                          color="accent"
+                          type="button"
+                          routerLink="/login"
+                          >
+                          {{ "COMMON.CANCEL" | translate }}
+                        </button>
+                      </div>
+                    </form>
+                  </mat-card-content>
+                </mat-card>
+              </div>
