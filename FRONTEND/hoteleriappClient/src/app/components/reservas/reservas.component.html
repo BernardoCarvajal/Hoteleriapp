@@ -1,265 +1,288 @@
 <div class="reserva-container">
   <!-- Vista de búsqueda de reservas -->
-  <div *ngIf="!viendoMisReservas">
-    <mat-card>
-      <mat-card-header>
-        <mat-card-title>{{
-          "RESERVATION.CHECK_AVAILABILITY" | translate
-        }}</mat-card-title>
-      </mat-card-header>
-      <mat-card-content>
-        <div class="acciones-mis-reservas" style="margin-bottom: 16px">
-          <button mat-stroked-button color="primary" (click)="verMisReservas()">
-            <mat-icon>assignment</mat-icon>
-            {{ "RESERVATION.MY_RESERVATIONS" | translate }}
-          </button>
-        </div>
-        <form (ngSubmit)="buscarDisponibilidad()" class="reserva-form">
-          <div class="form-row">
-            <mat-form-field appearance="outline" class="full-width">
-              <mat-label>{{
-                "RESERVATION.ARRIVAL_DATE" | translate
-              }}</mat-label>
-              <input
-                matInput
-                [matDatepicker]="picker1"
-                [(ngModel)]="fechaLlegada"
-                (ngModelChange)="setFechaLlegada($event)"
-                name="fechaLlegada"
-                required
-                [min]="minFechaLlegada"
-              />
-              <mat-datepicker-toggle
-                matSuffix
-                [for]="picker1"
-              ></mat-datepicker-toggle>
-              <mat-datepicker #picker1></mat-datepicker>
-            </mat-form-field>
-            <mat-form-field appearance="outline" class="full-width">
-              <mat-label>{{
-                "RESERVATION.DEPARTURE_DATE" | translate
-              }}</mat-label>
-              <input
-                matInput
-                [matDatepicker]="picker2"
-                [(ngModel)]="fechaSalida"
-                name="fechaSalida"
-                required
-                [min]="minFechaSalida"
-              />
-              <mat-datepicker-toggle
-                matSuffix
-                [for]="picker2"
-              ></mat-datepicker-toggle>
-              <mat-datepicker #picker2></mat-datepicker>
-            </mat-form-field>
-          </div>
-          <div class="form-row">
-            <mat-form-field appearance="outline" class="full-width">
-              <mat-label>{{ "RESERVATION.GUESTS" | translate }}</mat-label>
-              <input
-                matInput
-                type="number"
-                [(ngModel)]="numHuespedes"
-                name="numHuespedes"
-                min="1"
-                required
-              />
-            </mat-form-field>
-          </div>
-          <div class="form-row">
-            <button
-              mat-raised-button
-              color="primary"
-              type="submit"
-              [disabled]="buscando"
-            >
-              <mat-icon *ngIf="buscando" class="spin">autorenew</mat-icon>
-              {{ "RESERVATION.SEARCH" | translate }}
+  @if (!viendoMisReservas) {
+    <div>
+      <mat-card>
+        <mat-card-header>
+          <mat-card-title>{{
+            "RESERVATION.CHECK_AVAILABILITY" | translate
+          }}</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="acciones-mis-reservas" style="margin-bottom: 16px">
+            <button mat-stroked-button color="primary" (click)="verMisReservas()">
+              <mat-icon>assignment</mat-icon>
+              {{ "RESERVATION.MY_RESERVATIONS" | translate }}
             </button>
           </div>
-        </form>
-        <mat-error *ngIf="error">{{ error }}</mat-error>
-      </mat-card-content>
-    </mat-card>
-
-    <mat-card
-      *ngIf="habitacionesDisponibles.length > 0"
-      class="result-card"
-      style="background: none; box-shadow: none"
-    >
-      <mat-card-header>
-        <mat-card-title>{{
-          "RESERVATION.SELECT_ROOM" | translate
-        }}</mat-card-title>
-      </mat-card-header>
-      <mat-card-content>
-        <div class="habitaciones-grid">
-          <mat-card
-            *ngFor="let hab of habitacionesDisponibles"
-            class="habitacion-card"
-          >
-            <img
-              mat-card-image
-              [src]="getImagenHabitacion(hab.tipo ?? '')"
-              [alt]="getTipoHabitacionTraducido(hab.tipo)"
-            />
-            <mat-card-header>
-              <mat-icon mat-card-avatar color="primary">hotel</mat-icon>
-              <mat-card-title>{{ hab.tipo ?? "" | translate }}</mat-card-title>
-              <mat-card-subtitle>{{ hab.tipo }}</mat-card-subtitle>
-            </mat-card-header>
-            <mat-card-content>
-              <p>
-                <strong>{{ "RESERVATION.GUESTS" | translate }}:</strong>
-                {{ hab.capacidad }}
-              </p>
-              <p *ngIf="hab.precio_por_noche">
-                <strong>{{ "RESERVATION.PRICE" | translate }}:</strong>
-                {{
-                  hab.precio_por_noche | currency : "USD" : "symbol" : "1.2-2"
-                }}
-              </p>
-              <p *ngIf="hab.descripcion">
-                <strong>{{ "COMMON.DESCRIPTION" | translate }}:</strong>
-                {{ hab.descripcion }}
-              </p>
-            </mat-card-content>
-            <mat-card-actions>
-              <button mat-raised-button color="accent" (click)="abrirPago(hab)">
-                <mat-icon>event_available</mat-icon>
-                {{ "RESERVATION.RESERVE" | translate }}
-              </button>
-            </mat-card-actions>
-          </mat-card>
-        </div>
-      </mat-card-content>
-    </mat-card>
-
-    <mat-card
-      *ngIf="
-        !buscando &&
-        habitacionesDisponibles.length === 0 &&
-        fechaLlegada &&
-        fechaSalida
-      "
-      class="result-card"
-    >
-      <mat-card-content>
-        <p>{{ "RESERVATION.NO_ROOMS" | translate }}</p>
-      </mat-card-content>
-    </mat-card>
-  </div>
-
-  <!-- Vista de mis reservas -->
-  <div *ngIf="viendoMisReservas">
-    <mat-card>
-      <mat-card-header>
-        <mat-card-title>{{
-          "RESERVATION.MY_RESERVATIONS" | translate
-        }}</mat-card-title>
-        <button mat-button color="primary" (click)="volverABuscar()">
-          <mat-icon>arrow_back</mat-icon>
-          {{ "RESERVATION.CHECK_AVAILABILITY" | translate }}
-        </button>
-      </mat-card-header>
-      <mat-card-content>
-        <div *ngIf="misReservas.length === 0">
-          <p>{{ "RESERVATION.NO_RESERVATIONS" | translate }}</p>
-        </div>
-        <div *ngIf="misReservas.length > 0" class="reservas-lista">
-          <mat-card *ngFor="let reserva of misReservas" class="reserva-item">
-            <mat-card-header>
-              <mat-icon mat-card-avatar color="primary">hotel</mat-icon>
-              <mat-card-title>
-                {{ "RESERVATION.RESERVATION" | translate }} #{{ reserva.code }}
-              </mat-card-title>
-              <mat-card-subtitle>
-                <span
-                  class="estado-badge"
-                  [ngClass]="'estado-' + reserva.status"
+          <form (ngSubmit)="buscarDisponibilidad()" class="reserva-form">
+            <div class="form-row">
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>{{
+                  "RESERVATION.ARRIVAL_DATE" | translate
+                }}</mat-label>
+                <input
+                  matInput
+                  [matDatepicker]="picker1"
+                  [(ngModel)]="fechaLlegada"
+                  (ngModelChange)="setFechaLlegada($event)"
+                  name="fechaLlegada"
+                  required
+                  [min]="minFechaLlegada"
+                  />
+                  <mat-datepicker-toggle
+                    matSuffix
+                    [for]="picker1"
+                  ></mat-datepicker-toggle>
+                  <mat-datepicker #picker1></mat-datepicker>
+                </mat-form-field>
+                <mat-form-field appearance="outline" class="full-width">
+                  <mat-label>{{
+                    "RESERVATION.DEPARTURE_DATE" | translate
+                  }}</mat-label>
+                  <input
+                    matInput
+                    [matDatepicker]="picker2"
+                    [(ngModel)]="fechaSalida"
+                    name="fechaSalida"
+                    required
+                    [min]="minFechaSalida"
+                    />
+                    <mat-datepicker-toggle
+                      matSuffix
+                      [for]="picker2"
+                    ></mat-datepicker-toggle>
+                    <mat-datepicker #picker2></mat-datepicker>
+                  </mat-form-field>
+                </div>
+                <div class="form-row">
+                  <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>{{ "RESERVATION.GUESTS" | translate }}</mat-label>
+                    <input
+                      matInput
+                      type="number"
+                      [(ngModel)]="numHuespedes"
+                      name="numHuespedes"
+                      min="1"
+                      required
+                      />
+                    </mat-form-field>
+                  </div>
+                  <div class="form-row">
+                    <button
+                      mat-raised-button
+                      color="primary"
+                      type="submit"
+                      [disabled]="buscando"
+                      >
+                      @if (buscando) {
+                        <mat-icon class="spin">autorenew</mat-icon>
+                      }
+                      {{ "RESERVATION.SEARCH" | translate }}
+                    </button>
+                  </div>
+                </form>
+                @if (error) {
+                  <mat-error>{{ error }}</mat-error>
+                }
+              </mat-card-content>
+            </mat-card>
+            @if (habitacionesDisponibles.length > 0) {
+              <mat-card
+                class="result-card"
+                style="background: none; box-shadow: none"
                 >
-                  {{ "RESERVATION." + reserva.status | translate }}
-                </span>
-              </mat-card-subtitle>
-            </mat-card-header>
-            <mat-card-content>
-              <div class="info-reserva">
-                <div class="info-section">
-                  <p>
-                    <strong>{{ "RESERVATION.DATES" | translate }}:</strong>
-                    {{ formatearFecha(reserva.startDate) }} a
-                    {{ formatearFecha(reserva.endDate) }}
-                  </p>
-                  <p>
-                    <strong>{{ "RESERVATION.NIGHTS" | translate }}:</strong>
-                    {{ reserva.nights }}
-                    {{
-                      reserva.nights === 1
-                        ? ("RESERVATION.NIGHT" | translate)
-                        : ("RESERVATION.NIGHTS" | translate)
-                    }}
-                  </p>
-                  <p>
-                    <strong>{{ "RESERVATION.GUESTS" | translate }}:</strong>
-                    {{ reserva.guests }}
-                  </p>
-                </div>
-                <div class="info-section">
-                  <p>
-                    <strong>{{ "RESERVATION.ROOMS" | translate }}:</strong>
-                    {{ reserva.rooms.join(", ") }}
-                  </p>
-                  <p>
-                    <strong>{{ "RESERVATION.SUBTOTAL" | translate }}:</strong>
-                    {{
-                      reserva.subtotal | currency : "USD" : "symbol" : "1.2-2"
-                    }}
-                  </p>
-                  <p>
-                    <strong>{{ "RESERVATION.TAXES" | translate }}:</strong>
-                    {{ reserva.taxes | currency : "USD" : "symbol" : "1.2-2" }}
-                  </p>
-                </div>
-              </div>
-              <div class="totales-reserva">
-                <p>
-                  <strong>{{ "RESERVATION.TOTAL" | translate }}:</strong>
-                  {{ reserva.total | currency : "USD" : "symbol" : "1.2-2" }}
-                </p>
-                <p>
-                  <strong>{{ "RESERVATION.PAID" | translate }}:</strong>
-                  {{ reserva.paid | currency : "USD" : "symbol" : "1.2-2" }}
-                </p>
-                <p>
-                  <strong>{{ "RESERVATION.PENDING" | translate }}:</strong>
-                  <span [ngClass]="{ 'pendiente-pago': reserva.pending > 0 }">
-                    {{
-                      reserva.pending | currency : "USD" : "symbol" : "1.2-2"
-                    }}
-                  </span>
-                </p>
-              </div>
-            </mat-card-content>
-            <mat-card-actions *ngIf="reserva.pending > 0">
-              <button mat-raised-button color="accent">
-                <mat-icon>payment</mat-icon>
-                {{ "RESERVATION.COMPLETE_PAYMENT" | translate }}
-              </button>
-            </mat-card-actions>
-            <mat-card-actions *ngIf="reserva.pending === 0 || reserva.paid > 0">
-              <button
-                mat-raised-button
-                color="primary"
-                (click)="verTicket(reserva)"
-              >
-                <mat-icon>receipt</mat-icon>
-                {{ "RESERVATION.VIEW_TICKET" | translate }}
-              </button>
-            </mat-card-actions>
-          </mat-card>
+                <mat-card-header>
+                  <mat-card-title>{{
+                    "RESERVATION.SELECT_ROOM" | translate
+                  }}</mat-card-title>
+                </mat-card-header>
+                <mat-card-content>
+                  <div class="habitaciones-grid">
+                    @for (hab of habitacionesDisponibles; track hab) {
+                      <mat-card
+                        class="habitacion-card"
+                        >
+                        <img
+                          mat-card-image
+                          [src]="getImagenHabitacion(hab.tipo ?? '')"
+                          [alt]="getTipoHabitacionTraducido(hab.tipo)"
+                          />
+                          <mat-card-header>
+                            <mat-icon mat-card-avatar color="primary">hotel</mat-icon>
+                            <mat-card-title>{{ hab.tipo ?? "" | translate }}</mat-card-title>
+                            <mat-card-subtitle>{{ hab.tipo }}</mat-card-subtitle>
+                          </mat-card-header>
+                          <mat-card-content>
+                            <p>
+                              <strong>{{ "RESERVATION.GUESTS" | translate }}:</strong>
+                              {{ hab.capacidad }}
+                            </p>
+                            @if (hab.precio_por_noche) {
+                              <p>
+                                <strong>{{ "RESERVATION.PRICE" | translate }}:</strong>
+                                {{
+                                hab.precio_por_noche | currency : "USD" : "symbol" : "1.2-2"
+                                }}
+                              </p>
+                            }
+                            @if (hab.descripcion) {
+                              <p>
+                                <strong>{{ "COMMON.DESCRIPTION" | translate }}:</strong>
+                                {{ hab.descripcion }}
+                              </p>
+                            }
+                          </mat-card-content>
+                          <mat-card-actions>
+                            <button mat-raised-button color="accent" (click)="abrirPago(hab)">
+                              <mat-icon>event_available</mat-icon>
+                              {{ "RESERVATION.RESERVE" | translate }}
+                            </button>
+                          </mat-card-actions>
+                        </mat-card>
+                      }
+                    </div>
+                  </mat-card-content>
+                </mat-card>
+              }
+              @if (
+                !buscando &&
+                habitacionesDisponibles.length === 0 &&
+                fechaLlegada &&
+                fechaSalida
+                ) {
+                <mat-card
+                  class="result-card"
+                  >
+                  <mat-card-content>
+                    <p>{{ "RESERVATION.NO_ROOMS" | translate }}</p>
+                  </mat-card-content>
+                </mat-card>
+              }
+            </div>
+          }
+
+          <!-- Vista de mis reservas -->
+          @if (viendoMisReservas) {
+            <div>
+              <mat-card>
+                <mat-card-header>
+                  <mat-card-title>{{
+                    "RESERVATION.MY_RESERVATIONS" | translate
+                  }}</mat-card-title>
+                  <button mat-button color="primary" (click)="volverABuscar()">
+                    <mat-icon>arrow_back</mat-icon>
+                    {{ "RESERVATION.CHECK_AVAILABILITY" | translate }}
+                  </button>
+                </mat-card-header>
+                <mat-card-content>
+                  @if (misReservas.length === 0) {
+                    <div>
+                      <p>{{ "RESERVATION.NO_RESERVATIONS" | translate }}</p>
+                    </div>
+                  }
+                  @if (misReservas.length > 0) {
+                    <div class="reservas-lista">
+                      @for (reserva of misReservas; track reserva) {
+                        <mat-card class="reserva-item">
+                          <mat-card-header>
+                            <mat-icon mat-card-avatar color="primary">hotel</mat-icon>
+                            <mat-card-title>
+                              {{ "RESERVATION.RESERVATION" | translate }} #{{ reserva.code }}
+                            </mat-card-title>
+                            <mat-card-subtitle>
+                              <span
+                                class="estado-badge"
+                                [ngClass]="'estado-' + reserva.status"
+                                >
+                                {{ "RESERVATION." + reserva.status | translate }}
+                              </span>
+                            </mat-card-subtitle>
+                          </mat-card-header>
+                          <mat-card-content>
+                            <div class="info-reserva">
+                              <div class="info-section">
+                                <p>
+                                  <strong>{{ "RESERVATION.DATES" | translate }}:</strong>
+                                  {{ formatearFecha(reserva.startDate) }} a
+                                  {{ formatearFecha(reserva.endDate) }}
+                                </p>
+                                <p>
+                                  <strong>{{ "RESERVATION.NIGHTS" | translate }}:</strong>
+                                  {{ reserva.nights }}
+                                  {{
+                                  reserva.nights === 1
+                                  ? ("RESERVATION.NIGHT" | translate)
+                                  : ("RESERVATION.NIGHTS" | translate)
+                                  }}
+                                </p>
+                                <p>
+                                  <strong>{{ "RESERVATION.GUESTS" | translate }}:</strong>
+                                  {{ reserva.guests }}
+                                </p>
+                              </div>
+                              <div class="info-section">
+                                <p>
+                                  <strong>{{ "RESERVATION.ROOMS" | translate }}:</strong>
+                                  {{ reserva.rooms.join(", ") }}
+                                </p>
+                                <p>
+                                  <strong>{{ "RESERVATION.SUBTOTAL" | translate }}:</strong>
+                                  {{
+                                  reserva.subtotal | currency : "USD" : "symbol" : "1.2-2"
+                                  }}
+                                </p>
+                                <p>
+                                  <strong>{{ "RESERVATION.TAXES" | translate }}:</strong>
+                                  {{ reserva.taxes | currency : "USD" : "symbol" : "1.2-2" }}
+                                </p>
+                              </div>
+                            </div>
+                            <div class="totales-reserva">
+                              <p>
+                                <strong>{{ "RESERVATION.TOTAL" | translate }}:</strong>
+                                {{ reserva.total | currency : "USD" : "symbol" : "1.2-2" }}
+                              </p>
+                              <p>
+                                <strong>{{ "RESERVATION.PAID" | translate }}:</strong>
+                                {{ reserva.paid | currency : "USD" : "symbol" : "1.2-2" }}
+                              </p>
+                              <p>
+                                <strong>{{ "RESERVATION.PENDING" | translate }}:</strong>
+                                <span [ngClass]="{ 'pendiente-pago': reserva.pending > 0 }">
+                                  {{
+                                  reserva.pending | currency : "USD" : "symbol" : "1.2-2"
+                                  }}
+                                </span>
+                              </p>
+                            </div>
+                          </mat-card-content>
+                          @if (reserva.pending > 0) {
+                            <mat-card-actions>
+                              <button mat-raised-button color="accent">
+                                <mat-icon>payment</mat-icon>
+                                {{ "RESERVATION.COMPLETE_PAYMENT" | translate }}
+                              </button>
+                            </mat-card-actions>
+                          }
+                          @if (reserva.pending === 0 || reserva.paid > 0) {
+                            <mat-card-actions>
+                              <button
+                                mat-raised-button
+                                color="primary"
+                                (click)="verTicket(reserva)"
+                                >
+                                <mat-icon>receipt</mat-icon>
+                                {{ "RESERVATION.VIEW_TICKET" | translate }}
+                              </button>
+                            </mat-card-actions>
+                          }
+                        </mat-card>
+                      }
+                    </div>
+                  }
+                </mat-card-content>
+              </mat-card>
+            </div>
+          }
         </div>
-      </mat-card-content>
-    </mat-card>
-  </div>
-</div>

@@ -4,116 +4,125 @@
     <div class="codigo"><strong>Código:</strong> {{ reserva.code }}</div>
   </div>
 
-  <div *ngIf="cargando" class="cargando">
-    <mat-icon class="spin">autorenew</mat-icon>
-    <span>Cargando ticket...</span>
-  </div>
-
-  <div *ngIf="error" class="error-mensaje">
-    {{ error }}
-  </div>
-
-  <div *ngIf="!cargando && !error" class="ticket-content">
-    <!-- Qr Code -->
-    <div class="qr-section">
-      <img [src]="qrDataUrl" alt="Código QR del ticket" class="qr-code" />
-      <p class="qr-info">Escanea este código para acceder al ticket</p>
+  @if (cargando) {
+    <div class="cargando">
+      <mat-icon class="spin">autorenew</mat-icon>
+      <span>Cargando ticket...</span>
     </div>
+  }
 
-    <!-- Detalles de la reserva -->
-    <div class="detalles-reserva">
-      <div class="detalle-item">
-        <span class="label">Estado:</span>
-        <span
-          class="value estado-badge"
-          [ngClass]="'estado-' + reserva.status"
-          >{{ reserva.status | titlecase }}</span
-        >
+  @if (error) {
+    <div class="error-mensaje">
+      {{ error }}
+    </div>
+  }
+
+  @if (!cargando && !error) {
+    <div class="ticket-content">
+      <!-- Qr Code -->
+      <div class="qr-section">
+        <img [src]="qrDataUrl" alt="Código QR del ticket" class="qr-code" />
+        <p class="qr-info">Escanea este código para acceder al ticket</p>
       </div>
-      <div class="detalle-item">
-        <span class="label">Fecha de entrada:</span>
-        <span class="value">{{ formatearFecha(reserva.startDate) }}</span>
-      </div>
-      <div class="detalle-item">
-        <span class="label">Fecha de salida:</span>
-        <span class="value">{{ formatearFecha(reserva.endDate) }}</span>
-      </div>
-      <div class="detalle-item">
-        <span class="label">Duración:</span>
-        <span class="value"
-          >{{ reserva.nights }}
-          {{ reserva.nights === 1 ? "noche" : "noches" }}</span
-        >
-      </div>
-      <div class="detalle-item">
-        <span class="label">Habitaciones:</span>
-        <span class="value">{{ (reserva.rooms || []).join(", ") }}</span>
-      </div>
-      <div class="detalle-item">
-        <span class="label">Huéspedes:</span>
-        <span class="value">{{ reserva.guests }}</span>
+      <!-- Detalles de la reserva -->
+      <div class="detalles-reserva">
+        <div class="detalle-item">
+          <span class="label">Estado:</span>
+          <span
+            class="value estado-badge"
+            [ngClass]="'estado-' + reserva.status"
+            >{{ reserva.status | titlecase }}</span
+            >
+          </div>
+          <div class="detalle-item">
+            <span class="label">Fecha de entrada:</span>
+            <span class="value">{{ formatearFecha(reserva.startDate) }}</span>
+          </div>
+          <div class="detalle-item">
+            <span class="label">Fecha de salida:</span>
+            <span class="value">{{ formatearFecha(reserva.endDate) }}</span>
+          </div>
+          <div class="detalle-item">
+            <span class="label">Duración:</span>
+            <span class="value"
+              >{{ reserva.nights }}
+              {{ reserva.nights === 1 ? "noche" : "noches" }}</span
+              >
+            </div>
+            <div class="detalle-item">
+              <span class="label">Habitaciones:</span>
+              <span class="value">{{ (reserva.rooms || []).join(", ") }}</span>
+            </div>
+            <div class="detalle-item">
+              <span class="label">Huéspedes:</span>
+              <span class="value">{{ reserva.guests }}</span>
+            </div>
+          </div>
+          <!-- Información de pago -->
+          <div class="info-pago">
+            <h3>Información de pago</h3>
+            <div class="detalle-item">
+              <span class="label">Subtotal:</span>
+              <span class="value">{{
+                reserva.subtotal | currency : "USD" : "symbol" : "1.2-2"
+              }}</span>
+            </div>
+            <div class="detalle-item">
+              <span class="label">Impuestos:</span>
+              <span class="value">{{
+                reserva.taxes | currency : "USD" : "symbol" : "1.2-2"
+              }}</span>
+            </div>
+            <div class="detalle-item total">
+              <span class="label">Total:</span>
+              <span class="value">{{
+                reserva.total | currency : "USD" : "symbol" : "1.2-2"
+              }}</span>
+            </div>
+            <div class="detalle-item">
+              <span class="label">Pagado:</span>
+              <span class="value">{{
+                reserva.paid | currency : "USD" : "symbol" : "1.2-2"
+              }}</span>
+            </div>
+            @if (reserva.pending > 0) {
+              <div class="detalle-item">
+                <span class="label">Pendiente:</span>
+                <span class="value pendiente-pago">{{
+                  reserva.pending | currency : "USD" : "symbol" : "1.2-2"
+                }}</span>
+              </div>
+            }
+          </div>
+          <!-- Instrucciones -->
+          <div class="instrucciones">
+            <p>
+              Por favor presenta este ticket al momento de hacer check-in en el hotel.
+            </p>
+            <p>Fecha de emisión: {{ getCurrentDate() }}</p>
+          </div>
+        </div>
+      }
+
+      <!-- Acciones -->
+      <div class="ticket-actions">
+        <button
+          mat-button
+          color="accent"
+          (click)="descargarTicket()"
+          [disabled]="cargando || error || generandoPDF"
+          >
+          @if (!generandoPDF) {
+            <mat-icon>download</mat-icon>
+          }
+          @if (generandoPDF) {
+            <mat-icon class="spin">autorenew</mat-icon>
+          }
+          {{ generandoPDF ? "Generando PDF..." : "Descargar Ticket" }}
+        </button>
+        <button mat-button color="primary" (click)="cerrar()">
+          <mat-icon>close</mat-icon>
+          Cerrar
+        </button>
       </div>
     </div>
-
-    <!-- Información de pago -->
-    <div class="info-pago">
-      <h3>Información de pago</h3>
-      <div class="detalle-item">
-        <span class="label">Subtotal:</span>
-        <span class="value">{{
-          reserva.subtotal | currency : "USD" : "symbol" : "1.2-2"
-        }}</span>
-      </div>
-      <div class="detalle-item">
-        <span class="label">Impuestos:</span>
-        <span class="value">{{
-          reserva.taxes | currency : "USD" : "symbol" : "1.2-2"
-        }}</span>
-      </div>
-      <div class="detalle-item total">
-        <span class="label">Total:</span>
-        <span class="value">{{
-          reserva.total | currency : "USD" : "symbol" : "1.2-2"
-        }}</span>
-      </div>
-      <div class="detalle-item">
-        <span class="label">Pagado:</span>
-        <span class="value">{{
-          reserva.paid | currency : "USD" : "symbol" : "1.2-2"
-        }}</span>
-      </div>
-      <div class="detalle-item" *ngIf="reserva.pending > 0">
-        <span class="label">Pendiente:</span>
-        <span class="value pendiente-pago">{{
-          reserva.pending | currency : "USD" : "symbol" : "1.2-2"
-        }}</span>
-      </div>
-    </div>
-
-    <!-- Instrucciones -->
-    <div class="instrucciones">
-      <p>
-        Por favor presenta este ticket al momento de hacer check-in en el hotel.
-      </p>
-      <p>Fecha de emisión: {{ getCurrentDate() }}</p>
-    </div>
-  </div>
-
-  <!-- Acciones -->
-  <div class="ticket-actions">
-    <button
-      mat-button
-      color="accent"
-      (click)="descargarTicket()"
-      [disabled]="cargando || error || generandoPDF"
-    >
-      <mat-icon *ngIf="!generandoPDF">download</mat-icon>
-      <mat-icon *ngIf="generandoPDF" class="spin">autorenew</mat-icon>
-      {{ generandoPDF ? "Generando PDF..." : "Descargar Ticket" }}
-    </button>
-    <button mat-button color="primary" (click)="cerrar()">
-      <mat-icon>close</mat-icon>
-      Cerrar
-    </button>
-  </div>
-</div>

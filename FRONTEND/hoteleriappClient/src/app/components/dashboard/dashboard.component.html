@@ -7,7 +7,7 @@
       mat-raised-button
       [class.tab-activo]="tabActivo === 'reservas'"
       (click)="cambiarTab('reservas')"
-    >
+      >
       <mat-icon>receipt</mat-icon>
       {{ "DASHBOARD.RESERVATIONS_REPORT" | translate }}
     </button>
@@ -15,402 +15,396 @@
       mat-raised-button
       [class.tab-activo]="tabActivo === 'ocupacion'"
       (click)="cambiarTab('ocupacion')"
-    >
+      >
       <mat-icon>hotel</mat-icon> {{ "DASHBOARD.OCCUPANCY_REPORT" | translate }}
     </button>
   </div>
 
   <!-- Contenido del reporte de reservas -->
-  <div class="tab-content" *ngIf="tabActivo === 'reservas'">
-    <!-- Formulario de filtros de reservas -->
-    <mat-card class="filtros-card">
-      <mat-card-header>
-        <mat-card-title>{{ "DASHBOARD.FILTERS" | translate }}</mat-card-title>
-      </mat-card-header>
-      <mat-card-content>
-        <form [formGroup]="filtroForm" (ngSubmit)="cargarReporte()">
-          <div class="filtros-grid">
-            <mat-form-field appearance="fill">
-              <mat-label>{{ "DASHBOARD.START_DATE" | translate }}</mat-label>
-              <input
-                matInput
-                [matDatepicker]="pickerInicio"
-                formControlName="fechaInicio"
-                [max]="maxFecha"
-              />
-              <mat-datepicker-toggle
-                matSuffix
-                [for]="pickerInicio"
-              ></mat-datepicker-toggle>
-              <mat-datepicker #pickerInicio></mat-datepicker>
-            </mat-form-field>
-
-            <mat-form-field appearance="fill">
-              <mat-label>{{ "DASHBOARD.END_DATE" | translate }}</mat-label>
-              <input
-                matInput
-                [matDatepicker]="pickerFin"
-                formControlName="fechaFin"
-                [max]="maxFecha"
-              />
-              <mat-datepicker-toggle
-                matSuffix
-                [for]="pickerFin"
-              ></mat-datepicker-toggle>
-              <mat-datepicker #pickerFin></mat-datepicker>
-            </mat-form-field>
-
-            <mat-form-field appearance="fill">
-              <mat-label>{{ "DASHBOARD.STATUS" | translate }}</mat-label>
-              <mat-select formControlName="estado">
-                <mat-option value="">{{
-                  "DASHBOARD.ALL" | translate
-                }}</mat-option>
-                <mat-option value="pendiente">{{
-                  "RESERVATION.PENDING" | translate
-                }}</mat-option>
-                <mat-option value="confirmada">{{
-                  "RESERVATION.CONFIRMED" | translate
-                }}</mat-option>
-                <mat-option value="cancelada">{{
-                  "RESERVATION.CANCELLED" | translate
-                }}</mat-option>
-                <mat-option value="completada">{{
-                  "DASHBOARD.COMPLETED" | translate
-                }}</mat-option>
-              </mat-select>
-            </mat-form-field>
-
-            <mat-form-field appearance="fill">
-              <mat-label>{{ "DASHBOARD.CLIENT_ID" | translate }}</mat-label>
-              <input
-                matInput
-                formControlName="clienteId"
-                type="number"
-                min="1"
-              />
-            </mat-form-field>
-          </div>
-
-          <div class="filtros-botones">
-            <button type="submit" mat-raised-button color="primary">
-              <mat-icon>search</mat-icon> {{ "COMMON.SEARCH" | translate }}
-            </button>
-            <button type="button" mat-stroked-button (click)="limpiarFiltros()">
-              <mat-icon>clear</mat-icon> {{ "DASHBOARD.CLEAR" | translate }}
-            </button>
-            <button
-              type="button"
-              mat-raised-button
-              color="accent"
-              (click)="exportarCSV()"
+  @if (tabActivo === 'reservas') {
+    <div class="tab-content">
+      <!-- Formulario de filtros de reservas -->
+      <mat-card class="filtros-card">
+        <mat-card-header>
+          <mat-card-title>{{ "DASHBOARD.FILTERS" | translate }}</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <form [formGroup]="filtroForm" (ngSubmit)="cargarReporte()">
+            <div class="filtros-grid">
+              <mat-form-field appearance="fill">
+                <mat-label>{{ "DASHBOARD.START_DATE" | translate }}</mat-label>
+                <input
+                  matInput
+                  [matDatepicker]="pickerInicio"
+                  formControlName="fechaInicio"
+                  [max]="maxFecha"
+                  />
+                  <mat-datepicker-toggle
+                    matSuffix
+                    [for]="pickerInicio"
+                  ></mat-datepicker-toggle>
+                  <mat-datepicker #pickerInicio></mat-datepicker>
+                </mat-form-field>
+                <mat-form-field appearance="fill">
+                  <mat-label>{{ "DASHBOARD.END_DATE" | translate }}</mat-label>
+                  <input
+                    matInput
+                    [matDatepicker]="pickerFin"
+                    formControlName="fechaFin"
+                    [max]="maxFecha"
+                    />
+                    <mat-datepicker-toggle
+                      matSuffix
+                      [for]="pickerFin"
+                    ></mat-datepicker-toggle>
+                    <mat-datepicker #pickerFin></mat-datepicker>
+                  </mat-form-field>
+                  <mat-form-field appearance="fill">
+                    <mat-label>{{ "DASHBOARD.STATUS" | translate }}</mat-label>
+                    <mat-select formControlName="estado">
+                      <mat-option value="">{{
+                        "DASHBOARD.ALL" | translate
+                      }}</mat-option>
+                      <mat-option value="pendiente">{{
+                        "RESERVATION.PENDING" | translate
+                      }}</mat-option>
+                      <mat-option value="confirmada">{{
+                        "RESERVATION.CONFIRMED" | translate
+                      }}</mat-option>
+                      <mat-option value="cancelada">{{
+                        "RESERVATION.CANCELLED" | translate
+                      }}</mat-option>
+                      <mat-option value="completada">{{
+                        "DASHBOARD.COMPLETED" | translate
+                      }}</mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                  <mat-form-field appearance="fill">
+                    <mat-label>{{ "DASHBOARD.CLIENT_ID" | translate }}</mat-label>
+                    <input
+                      matInput
+                      formControlName="clienteId"
+                      type="number"
+                      min="1"
+                      />
+                    </mat-form-field>
+                  </div>
+                  <div class="filtros-botones">
+                    <button type="submit" mat-raised-button color="primary">
+                      <mat-icon>search</mat-icon> {{ "COMMON.SEARCH" | translate }}
+                    </button>
+                    <button type="button" mat-stroked-button (click)="limpiarFiltros()">
+                      <mat-icon>clear</mat-icon> {{ "DASHBOARD.CLEAR" | translate }}
+                    </button>
+                    <button
+                      type="button"
+                      mat-raised-button
+                      color="accent"
+                      (click)="exportarCSV()"
               [disabled]="
                 !reporteReservas || reporteReservas.reservas.length === 0
               "
-            >
-              <mat-icon>file_download</mat-icon>
-              {{ "DASHBOARD.EXPORT_CSV" | translate }}
-            </button>
-          </div>
-        </form>
-      </mat-card-content>
-    </mat-card>
-
-    <!-- Tarjetas de resumen de reservas -->
-    <div class="dashboard-resumen-cards" *ngIf="reporteReservas">
-      <mat-card class="resumen-card">
-        <mat-card-content>
-          <div class="resumen-valor">{{ reporteReservas.total_reservas }}</div>
-          <div class="resumen-label">
-            {{ "DASHBOARD.TOTAL_RESERVATIONS" | translate }}
-          </div>
-        </mat-card-content>
-      </mat-card>
-
-      <mat-card class="resumen-card">
-        <mat-card-content>
-          <div class="resumen-valor">
-            {{ formatearMoneda(reporteReservas.ingresos_totales) }}
-          </div>
-          <div class="resumen-label">
-            {{ "DASHBOARD.TOTAL_INCOME" | translate }}
-          </div>
-        </mat-card-content>
-      </mat-card>
-
-      <mat-card class="resumen-card">
-        <mat-card-content>
-          <div class="resumen-valor">
-            {{ formatearMoneda(reporteReservas.ingresos_pendientes) }}
-          </div>
-          <div class="resumen-label">
-            {{ "DASHBOARD.PENDING_PAYMENTS" | translate }}
-          </div>
-        </mat-card-content>
-      </mat-card>
-    </div>
-
-    <!-- Tabla de reservas -->
-    <div
-      class="tabla-contenedor"
-      *ngIf="reporteReservas && reporteReservas.reservas.length > 0"
-    >
-      <h2>{{ "DASHBOARD.RESERVATIONS_LIST" | translate }}</h2>
-      <table
-        mat-table
-        [dataSource]="dataSource"
-        class="mat-elevation-z8 reservas-tabla"
-      >
-        <!-- Columna de código -->
-        <ng-container matColumnDef="codigo">
-          <th mat-header-cell *matHeaderCellDef>
-            {{ "DASHBOARD.CODE" | translate }}
-          </th>
-          <td mat-cell *matCellDef="let reserva">
-            {{ reserva.codigo_reserva }}
-          </td>
-        </ng-container>
-
-        <!-- Columna de cliente -->
-        <ng-container matColumnDef="cliente">
-          <th mat-header-cell *matHeaderCellDef>
-            {{ "DASHBOARD.CLIENT" | translate }}
-          </th>
-          <td mat-cell *matCellDef="let reserva">{{ reserva.cliente }}</td>
-        </ng-container>
-
-        <!-- Columna de fechas -->
-        <ng-container matColumnDef="fechas">
-          <th mat-header-cell *matHeaderCellDef>
-            {{ "DASHBOARD.DATES" | translate }}
-          </th>
-          <td mat-cell *matCellDef="let reserva">
-            <div>
-              {{ "DASHBOARD.FROM" | translate }}:
-              {{ formatearFecha(reserva.fecha_inicio) }}
-            </div>
-            <div>
-              {{ "DASHBOARD.TO" | translate }}:
-              {{ formatearFecha(reserva.fecha_fin) }}
-            </div>
-          </td>
-        </ng-container>
-
-        <!-- Columna de estado -->
-        <ng-container matColumnDef="estado">
-          <th mat-header-cell *matHeaderCellDef>
-            {{ "DASHBOARD.STATUS" | translate }}
-          </th>
-          <td mat-cell *matCellDef="let reserva">
-            <span
-              class="estado-chip"
-              [ngClass]="obtenerClaseEstado(reserva.estado)"
-            >
-              {{ "RESERVATION." + reserva.estado | translate }}
-            </span>
-          </td>
-        </ng-container>
-
-        <!-- Columna de habitaciones -->
-        <ng-container matColumnDef="habitaciones">
-          <th mat-header-cell *matHeaderCellDef>
-            {{ "DASHBOARD.ROOMS" | translate }}
-          </th>
-          <td mat-cell *matCellDef="let reserva">
-            <span
-              *ngFor="let hab of reserva.habitaciones"
-              class="habitacion-chip"
-            >
-              {{ hab }}
-            </span>
-          </td>
-        </ng-container>
-
-        <!-- Columna de pagos -->
-        <ng-container matColumnDef="pagos">
-          <th mat-header-cell *matHeaderCellDef>
-            {{ "DASHBOARD.PAYMENTS" | translate }}
-          </th>
-          <td mat-cell *matCellDef="let reserva">
-            <div>
-              {{ "DASHBOARD.PAID" | translate }}:
-              {{ formatearMoneda(reserva.total_pagado) }}
-            </div>
-            <div>
-              {{ "DASHBOARD.PENDING" | translate }}:
-              {{ formatearMoneda(reserva.total_pendiente) }}
-            </div>
-          </td>
-        </ng-container>
-
-        <tr mat-header-row *matHeaderRowDef="columnas"></tr>
-        <tr mat-row *matRowDef="let row; columns: columnas"></tr>
-      </table>
-    </div>
-
-    <!-- Mensaje sin datos de reservas -->
-    <div
-      *ngIf="reporteReservas && reporteReservas.reservas.length === 0"
-      class="sin-datos"
-    >
-      <mat-icon>info</mat-icon>
-      <span>{{ "DASHBOARD.NO_RESERVATIONS_FOUND" | translate }}</span>
-    </div>
-  </div>
-
-  <!-- Contenido del reporte de ocupación -->
-  <div class="tab-content" *ngIf="tabActivo === 'ocupacion'">
-    <!-- Formulario de filtros de ocupación -->
-    <mat-card class="filtros-card">
-      <mat-card-header>
-        <mat-card-title>{{
-          "DASHBOARD.SELECT_DATE" | translate
-        }}</mat-card-title>
-      </mat-card-header>
-      <mat-card-content>
-        <form
-          [formGroup]="filtroOcupacionForm"
-          (ngSubmit)="cargarReporteOcupacion()"
-        >
-          <div class="filtro-ocupacion">
-            <mat-form-field appearance="fill">
-              <mat-label>{{ "DASHBOARD.DATE" | translate }}</mat-label>
-              <input
-                matInput
-                [matDatepicker]="pickerOcupacion"
-                formControlName="fecha"
-              />
-              <mat-datepicker-toggle
-                matSuffix
-                [for]="pickerOcupacion"
-              ></mat-datepicker-toggle>
-              <mat-datepicker #pickerOcupacion></mat-datepicker>
-            </mat-form-field>
-
-            <button type="submit" mat-raised-button color="primary">
-              <mat-icon>search</mat-icon> {{ "DASHBOARD.CONSULT" | translate }}
-            </button>
-          </div>
-        </form>
-      </mat-card-content>
-    </mat-card>
-
-    <!-- Resumen de ocupación -->
-    <div *ngIf="reporteOcupacion">
-      <h2>
-        {{ "DASHBOARD.OCCUPANCY_REPORT" | translate }} -
-        {{ formatearFecha(reporteOcupacion.fecha) }}
-      </h2>
-
-      <!-- Indicador de ocupación -->
-      <div class="ocupacion-indicador-contenedor">
-        <div class="ocupacion-indicador">
-          <div class="ocupacion-porcentaje">
-            {{ reporteOcupacion.ocupacion_porcentaje.toFixed(2) }}%
-          </div>
-          <div class="ocupacion-label">
-            {{ "DASHBOARD.OCCUPANCY" | translate }}
-          </div>
-        </div>
-      </div>
-
-      <!-- Tarjetas de resumen de ocupación -->
-      <div class="dashboard-resumen-cards">
-        <mat-card class="resumen-card">
-          <mat-card-content>
-            <div class="resumen-valor">
-              {{ reporteOcupacion.habitaciones_totales }}
-            </div>
-            <div class="resumen-label">
-              {{ "DASHBOARD.TOTAL_ROOMS" | translate }}
-            </div>
-          </mat-card-content>
-        </mat-card>
-
-        <mat-card class="resumen-card">
-          <mat-card-content>
-            <div class="resumen-valor">
-              {{ reporteOcupacion.habitaciones_ocupadas }}
-            </div>
-            <div class="resumen-label">
-              {{ "DASHBOARD.OCCUPIED_ROOMS" | translate }}
-            </div>
-          </mat-card-content>
-        </mat-card>
-
-        <mat-card class="resumen-card">
-          <mat-card-content>
-            <div class="resumen-valor">
-              {{ reporteOcupacion.habitaciones_disponibles }}
-            </div>
-            <div class="resumen-label">
-              {{ "DASHBOARD.AVAILABLE_ROOMS" | translate }}
-            </div>
-          </mat-card-content>
-        </mat-card>
-      </div>
-
-      <!-- Desglose por tipo de habitación -->
-      <h3>{{ "DASHBOARD.BREAKDOWN_BY_ROOM_TYPE" | translate }}</h3>
-      <div class="desglose-tipos">
-        <mat-card
-          *ngFor="let tipo of obtenerTiposHabitacion()"
-          class="tipo-card"
-        >
-          <mat-card-header>
-            <mat-card-title>{{ "ROOM." + tipo | translate }}</mat-card-title>
-          </mat-card-header>
-          <mat-card-content>
-            <div class="tipo-datos">
-              <div>
-                <span class="tipo-label"
-                  >{{ "DASHBOARD.TOTAL" | translate }}:</span
-                >
-                <span class="tipo-valor">{{
-                  reporteOcupacion.desglose_por_tipo[tipo].total || 0
-                }}</span>
+                      >
+                      <mat-icon>file_download</mat-icon>
+                      {{ "DASHBOARD.EXPORT_CSV" | translate }}
+                    </button>
+                  </div>
+                </form>
+              </mat-card-content>
+            </mat-card>
+            <!-- Tarjetas de resumen de reservas -->
+            @if (reporteReservas) {
+              <div class="dashboard-resumen-cards">
+                <mat-card class="resumen-card">
+                  <mat-card-content>
+                    <div class="resumen-valor">{{ reporteReservas.total_reservas }}</div>
+                    <div class="resumen-label">
+                      {{ "DASHBOARD.TOTAL_RESERVATIONS" | translate }}
+                    </div>
+                  </mat-card-content>
+                </mat-card>
+                <mat-card class="resumen-card">
+                  <mat-card-content>
+                    <div class="resumen-valor">
+                      {{ formatearMoneda(reporteReservas.ingresos_totales) }}
+                    </div>
+                    <div class="resumen-label">
+                      {{ "DASHBOARD.TOTAL_INCOME" | translate }}
+                    </div>
+                  </mat-card-content>
+                </mat-card>
+                <mat-card class="resumen-card">
+                  <mat-card-content>
+                    <div class="resumen-valor">
+                      {{ formatearMoneda(reporteReservas.ingresos_pendientes) }}
+                    </div>
+                    <div class="resumen-label">
+                      {{ "DASHBOARD.PENDING_PAYMENTS" | translate }}
+                    </div>
+                  </mat-card-content>
+                </mat-card>
               </div>
-              <div>
-                <span class="tipo-label"
-                  >{{ "DASHBOARD.OCCUPIED" | translate }}:</span
+            }
+            <!-- Tabla de reservas -->
+            @if (reporteReservas && reporteReservas.reservas.length > 0) {
+              <div
+                class="tabla-contenedor"
                 >
-                <span class="tipo-valor">{{
-                  reporteOcupacion.desglose_por_tipo[tipo].ocupadas || 0
-                }}</span>
+                <h2>{{ "DASHBOARD.RESERVATIONS_LIST" | translate }}</h2>
+                <table
+                  mat-table
+                  [dataSource]="dataSource"
+                  class="mat-elevation-z8 reservas-tabla"
+                  >
+                  <!-- Columna de código -->
+                  <ng-container matColumnDef="codigo">
+                    <th mat-header-cell *matHeaderCellDef>
+                      {{ "DASHBOARD.CODE" | translate }}
+                    </th>
+                    <td mat-cell *matCellDef="let reserva">
+                      {{ reserva.codigo_reserva }}
+                    </td>
+                  </ng-container>
+                  <!-- Columna de cliente -->
+                  <ng-container matColumnDef="cliente">
+                    <th mat-header-cell *matHeaderCellDef>
+                      {{ "DASHBOARD.CLIENT" | translate }}
+                    </th>
+                    <td mat-cell *matCellDef="let reserva">{{ reserva.cliente }}</td>
+                  </ng-container>
+                  <!-- Columna de fechas -->
+                  <ng-container matColumnDef="fechas">
+                    <th mat-header-cell *matHeaderCellDef>
+                      {{ "DASHBOARD.DATES" | translate }}
+                    </th>
+                    <td mat-cell *matCellDef="let reserva">
+                      <div>
+                        {{ "DASHBOARD.FROM" | translate }}:
+                        {{ formatearFecha(reserva.fecha_inicio) }}
+                      </div>
+                      <div>
+                        {{ "DASHBOARD.TO" | translate }}:
+                        {{ formatearFecha(reserva.fecha_fin) }}
+                      </div>
+                    </td>
+                  </ng-container>
+                  <!-- Columna de estado -->
+                  <ng-container matColumnDef="estado">
+                    <th mat-header-cell *matHeaderCellDef>
+                      {{ "DASHBOARD.STATUS" | translate }}
+                    </th>
+                    <td mat-cell *matCellDef="let reserva">
+                      <span
+                        class="estado-chip"
+                        [ngClass]="obtenerClaseEstado(reserva.estado)"
+                        >
+                        {{ "RESERVATION." + reserva.estado | translate }}
+                      </span>
+                    </td>
+                  </ng-container>
+                  <!-- Columna de habitaciones -->
+                  <ng-container matColumnDef="habitaciones">
+                    <th mat-header-cell *matHeaderCellDef>
+                      {{ "DASHBOARD.ROOMS" | translate }}
+                    </th>
+                    <td mat-cell *matCellDef="let reserva">
+                      @for (hab of reserva.habitaciones; track hab) {
+                        <span
+                          class="habitacion-chip"
+                          >
+                          {{ hab }}
+                        </span>
+                      }
+                    </td>
+                  </ng-container>
+                  <!-- Columna de pagos -->
+                  <ng-container matColumnDef="pagos">
+                    <th mat-header-cell *matHeaderCellDef>
+                      {{ "DASHBOARD.PAYMENTS" | translate }}
+                    </th>
+                    <td mat-cell *matCellDef="let reserva">
+                      <div>
+                        {{ "DASHBOARD.PAID" | translate }}:
+                        {{ formatearMoneda(reserva.total_pagado) }}
+                      </div>
+                      <div>
+                        {{ "DASHBOARD.PENDING" | translate }}:
+                        {{ formatearMoneda(reserva.total_pendiente) }}
+                      </div>
+                    </td>
+                  </ng-container>
+                  <tr mat-header-row *matHeaderRowDef="columnas"></tr>
+                  <tr mat-row *matRowDef="let row; columns: columnas"></tr>
+                </table>
               </div>
-              <div>
-                <span class="tipo-label"
-                  >{{ "DASHBOARD.AVAILABLE" | translate }}:</span
+            }
+            <!-- Mensaje sin datos de reservas -->
+            @if (reporteReservas && reporteReservas.reservas.length === 0) {
+              <div
+                class="sin-datos"
                 >
-                <span class="tipo-valor">{{
-                  reporteOcupacion.desglose_por_tipo[tipo].disponibles || 0
-                }}</span>
+                <mat-icon>info</mat-icon>
+                <span>{{ "DASHBOARD.NO_RESERVATIONS_FOUND" | translate }}</span>
               </div>
-              <div>
-                <span class="tipo-label"
-                  >{{ "DASHBOARD.OCCUPANCY" | translate }}:</span
-                >
-                <span class="tipo-valor"
-                  >{{
-                    reporteOcupacion.desglose_por_tipo[tipo].porcentaje || 0
-                  }}%</span
-                >
-              </div>
-            </div>
-          </mat-card-content>
-        </mat-card>
-      </div>
-    </div>
-  </div>
+            }
+          </div>
+        }
 
-  <!-- Estado de carga y errores (común para ambos reportes) -->
-  <div *ngIf="cargando" class="cargando-contenedor">
-    <mat-spinner diameter="40"></mat-spinner>
-    <span>Cargando datos...</span>
-  </div>
+        <!-- Contenido del reporte de ocupación -->
+        @if (tabActivo === 'ocupacion') {
+          <div class="tab-content">
+            <!-- Formulario de filtros de ocupación -->
+            <mat-card class="filtros-card">
+              <mat-card-header>
+                <mat-card-title>{{
+                  "DASHBOARD.SELECT_DATE" | translate
+                }}</mat-card-title>
+              </mat-card-header>
+              <mat-card-content>
+                <form
+                  [formGroup]="filtroOcupacionForm"
+                  (ngSubmit)="cargarReporteOcupacion()"
+                  >
+                  <div class="filtro-ocupacion">
+                    <mat-form-field appearance="fill">
+                      <mat-label>{{ "DASHBOARD.DATE" | translate }}</mat-label>
+                      <input
+                        matInput
+                        [matDatepicker]="pickerOcupacion"
+                        formControlName="fecha"
+                        />
+                        <mat-datepicker-toggle
+                          matSuffix
+                          [for]="pickerOcupacion"
+                        ></mat-datepicker-toggle>
+                        <mat-datepicker #pickerOcupacion></mat-datepicker>
+                      </mat-form-field>
+                      <button type="submit" mat-raised-button color="primary">
+                        <mat-icon>search</mat-icon> {{ "DASHBOARD.CONSULT" | translate }}
+                      </button>
+                    </div>
+                  </form>
+                </mat-card-content>
+              </mat-card>
+              <!-- Resumen de ocupación -->
+              @if (reporteOcupacion) {
+                <div>
+                  <h2>
+                    {{ "DASHBOARD.OCCUPANCY_REPORT" | translate }} -
+                    {{ formatearFecha(reporteOcupacion.fecha) }}
+                  </h2>
+                  <!-- Indicador de ocupación -->
+                  <div class="ocupacion-indicador-contenedor">
+                    <div class="ocupacion-indicador">
+                      <div class="ocupacion-porcentaje">
+                        {{ reporteOcupacion.ocupacion_porcentaje.toFixed(2) }}%
+                      </div>
+                      <div class="ocupacion-label">
+                        {{ "DASHBOARD.OCCUPANCY" | translate }}
+                      </div>
+                    </div>
+                  </div>
+                  <!-- Tarjetas de resumen de ocupación -->
+                  <div class="dashboard-resumen-cards">
+                    <mat-card class="resumen-card">
+                      <mat-card-content>
+                        <div class="resumen-valor">
+                          {{ reporteOcupacion.habitaciones_totales }}
+                        </div>
+                        <div class="resumen-label">
+                          {{ "DASHBOARD.TOTAL_ROOMS" | translate }}
+                        </div>
+                      </mat-card-content>
+                    </mat-card>
+                    <mat-card class="resumen-card">
+                      <mat-card-content>
+                        <div class="resumen-valor">
+                          {{ reporteOcupacion.habitaciones_ocupadas }}
+                        </div>
+                        <div class="resumen-label">
+                          {{ "DASHBOARD.OCCUPIED_ROOMS" | translate }}
+                        </div>
+                      </mat-card-content>
+                    </mat-card>
+                    <mat-card class="resumen-card">
+                      <mat-card-content>
+                        <div class="resumen-valor">
+                          {{ reporteOcupacion.habitaciones_disponibles }}
+                        </div>
+                        <div class="resumen-label">
+                          {{ "DASHBOARD.AVAILABLE_ROOMS" | translate }}
+                        </div>
+                      </mat-card-content>
+                    </mat-card>
+                  </div>
+                  <!-- Desglose por tipo de habitación -->
+                  <h3>{{ "DASHBOARD.BREAKDOWN_BY_ROOM_TYPE" | translate }}</h3>
+                  <div class="desglose-tipos">
+                    @for (tipo of obtenerTiposHabitacion(); track tipo) {
+                      <mat-card
+                        class="tipo-card"
+                        >
+                        <mat-card-header>
+                          <mat-card-title>{{ "ROOM." + tipo | translate }}</mat-card-title>
+                        </mat-card-header>
+                        <mat-card-content>
+                          <div class="tipo-datos">
+                            <div>
+                              <span class="tipo-label"
+                                >{{ "DASHBOARD.TOTAL" | translate }}:</span
+                                >
+                                <span class="tipo-valor">{{
+                                  reporteOcupacion.desglose_por_tipo[tipo].total || 0
+                                }}</span>
+                              </div>
+                              <div>
+                                <span class="tipo-label"
+                                  >{{ "DASHBOARD.OCCUPIED" | translate }}:</span
+                                  >
+                                  <span class="tipo-valor">{{
+                                    reporteOcupacion.desglose_por_tipo[tipo].ocupadas || 0
+                                  }}</span>
+                                </div>
+                                <div>
+                                  <span class="tipo-label"
+                                    >{{ "DASHBOARD.AVAILABLE" | translate }}:</span
+                                    >
+                                    <span class="tipo-valor">{{
+                                      reporteOcupacion.desglose_por_tipo[tipo].disponibles || 0
+                                    }}</span>
+                                  </div>
+                                  <div>
+                                    <span class="tipo-label"
+                                      >{{ "DASHBOARD.OCCUPANCY" | translate }}:</span
+                                      >
+                                      <span class="tipo-valor"
+                                        >{{
+                                        reporteOcupacion.desglose_por_tipo[tipo].porcentaje || 0
+                                        }}%</span
+                                        >
+                                      </div>
+                                    </div>
+                                  </mat-card-content>
+                                </mat-card>
+                              }
+                            </div>
+                          </div>
+                        }
+                      </div>
+                    }
 
-  <div *ngIf="error" class="error-mensaje">
-    <mat-icon color="warn">error</mat-icon>
-    <span>{{ error }}</span>
-  </div>
-</div>
+                    <!-- Estado de carga y errores (común para ambos reportes) -->
+                    @if (cargando) {
+                      <div class="cargando-contenedor">
+                        <mat-spinner diameter="40"></mat-spinner>
+                        <span>Cargando datos...</span>
+                      </div>
+                    }
+
+                    @if (error) {
+                      <div class="error-mensaje">
+                        <mat-icon color="warn">error</mat-icon>
+                        <span>{{ error }}</span>
+                      </div>
+                    }
+                  </div>

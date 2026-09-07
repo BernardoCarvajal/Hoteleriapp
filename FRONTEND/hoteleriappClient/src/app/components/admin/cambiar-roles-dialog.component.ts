@@ -13,30 +13,38 @@ import { FormBuilder, FormGroup } from '@angular/forms';
       <div class="user-info mb-3">
         <strong>Usuario:</strong> {{data.usuario.nombre}} {{data.usuario.apellido}} ({{data.usuario.email}})
       </div>
-      <div *ngIf="cargando" class="text-center">
-        <mat-spinner diameter="40" class="mx-auto"></mat-spinner>
-        <p class="mt-2">Cargando roles...</p>
-      </div>
-      <form [formGroup]="rolesForm" *ngIf="!cargando && roles.length > 0">
-        <p>Seleccione un rol para el usuario:</p>
-        <mat-radio-group formControlName="rolSeleccionado" class="roles-container">
-          <div *ngFor="let rol of roles">
-            <mat-radio-button [value]="rol.id" class="mb-2">
-              <strong>{{rol.nombre}}</strong>
-              <div class="text-muted small">{{rol.descripcion}}</div>
-            </mat-radio-button>
-          </div>
-        </mat-radio-group>
-      </form>
+      @if (cargando) {
+        <div class="text-center">
+          <mat-spinner diameter="40" class="mx-auto"></mat-spinner>
+          <p class="mt-2">Cargando roles...</p>
+        </div>
+      }
+      @if (!cargando && roles.length > 0) {
+        <form [formGroup]="rolesForm">
+          <p>Seleccione un rol para el usuario:</p>
+          <mat-radio-group formControlName="rolSeleccionado" class="roles-container">
+            @for (rol of roles; track rol) {
+              <div>
+                <mat-radio-button [value]="rol.id" class="mb-2">
+                  <strong>{{rol.nombre}}</strong>
+                  <div class="text-muted small">{{rol.descripcion}}</div>
+                </mat-radio-button>
+              </div>
+            }
+          </mat-radio-group>
+        </form>
+      }
     </mat-dialog-content>
     <mat-dialog-actions align="end">
       <button mat-button mat-dialog-close>Cancelar</button>
       <button mat-raised-button color="primary" [disabled]="cargando || guardando || rolesForm.invalid" (click)="guardarRoles()">
-        <mat-spinner diameter="20" *ngIf="guardando" class="me-2"></mat-spinner>
+        @if (guardando) {
+          <mat-spinner diameter="20" class="me-2"></mat-spinner>
+        }
         Guardar
       </button>
     </mat-dialog-actions>
-  `,
+    `,
   styles: [`
     .roles-container {
       display: flex;
